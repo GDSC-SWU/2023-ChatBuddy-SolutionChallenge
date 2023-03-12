@@ -21,6 +21,14 @@
             "package_name": "com.example.chatbuddy",
             "certificate_hash": "b718b59a77262609cbecbfd1c98cca93b30caf7b"
           }
+        },
+        {
+          "client_id": "312507382741-db23apmsnqonar1m4njukv8a6kus7rbj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.chatbuddy",
+            "certificate_hash": "802f530235390ebc52a97604cdbce0f3d6f5fb16"
+          }
         }
       ],
       "api_key": [
