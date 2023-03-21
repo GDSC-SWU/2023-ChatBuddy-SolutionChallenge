@@ -1,8 +1,10 @@
 package com.example.chatbuddy;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -76,10 +78,17 @@ public class MainActivity extends AppCompatActivity {
     public static final MediaType JSON
             = MediaType.get("application/json; charset=utf-8");
     OkHttpClient client = new OkHttpClient();
+    String userName;
+    JSONArray messagesArray;
+    JSONObject messageObject;
+    private final int MAX_MESSAGE_COUNT = 1000; // 최대 메시지 수
+    int selfHarm;
 
+    // gps
+    LocationManager locationManager;
+    Location location;
+    LocationListener gpsLocationListener;
 
-
-    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,9 +105,35 @@ public class MainActivity extends AppCompatActivity {
         // 드로어
         mainActivity = findViewById(R.id.mainActivity);
         btnMenu = findViewById(R.id.btnMenu);
+        if (currentUser != null) {
+            String uid = currentUser.getUid();
+            uidRef = userRef.child(uid);
+            uidRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    // uid 노드의 모든 데이터를 가져옴
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        String key = snapshot.getKey(); // 하위 노드의 키값을 가져옴
+                        Object value = snapshot.getValue(); // 하위 노드의 값을 가져옴
+                        // 이곳에서 하위 노드의 키와 값을 사용하여 원하는 작업을 수행할 수 있음
+                        switch (key) {
+                            case "nickName":
+                                userName = value.toString();
+                                break;
+                        }
+                    }
+                }
 
-        LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        LinearLayout ll = (LinearLayout)inflater.inflate(R.layout.drawer, null);
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    // 데이터 로드에 실패한 경우 호출됨
+                    Log.w("TAG", "loadPost:onCancelled", databaseError.toException());
+                }
+            });
+        }
+
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LinearLayout ll = (LinearLayout) inflater.inflate(R.layout.drawer, null);
 
         AtomicInteger state = new AtomicInteger(); // 메뉴 상태 - 0이면 닫힌 상태, 1이면 열린 상태
 
@@ -106,12 +141,14 @@ public class MainActivity extends AppCompatActivity {
         final Animation animClose = AnimationUtils.loadAnimation(this, R.anim.anim_translate_right);
 
         // chat
-        messageList = new ArrayList<>();
-
         recyclerView = findViewById(R.id.recycler_view);
         welcomeTextView = findViewById(R.id.welcome_text);
         messageEditText = findViewById(R.id.message_edit_text);
         sendButton = findViewById(R.id.send_btn);
+
+        messageList = new ArrayList<>();
+        messagesArray = new JSONArray();
+        selfHarm = 0;
 
         // setup recycler view
         messageAdapter = new MessageAdapter(messageList);
@@ -122,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
 
         // 드로어
         btnMenu.setOnClickListener(view -> {
-            if(state.get() == 0) {
+            if (state.get() == 0) {
                 LinearLayout.LayoutParams paramll = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 addContentView(ll, paramll);
                 ll.startAnimation(animOpen);
@@ -132,63 +169,40 @@ public class MainActivity extends AppCompatActivity {
                 tvDrawerName = findViewById(R.id.drawerName);
 
                 // 이름
-                if (currentUser != null) {
-                    String uid = currentUser.getUid();
-                    uidRef = userRef.child(uid);
-                    uidRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            // uid 노드의 모든 데이터를 가져옴
-                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                String key = snapshot.getKey(); // 하위 노드의 키값을 가져옴
-                                Object value = snapshot.getValue(); // 하위 노드의 값을 가져옴
-                                // 이곳에서 하위 노드의 키와 값을 사용하여 원하는 작업을 수행할 수 있음
-                                switch (key) {
-                                    case "nickName":
-                                        tvDrawerName.setText(value.toString() + " 님");
-                                        break;
-                                }
-                            }
-                        }
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                            // 데이터 로드에 실패한 경우 호출됨
-                            Log.w("TAG", "loadPost:onCancelled", databaseError.toException());
-                        }
-                    });
-                }
+                tvDrawerName.setText(userName + " 님");
 
                 btnFirst = findViewById(R.id.first);
-                btnFirst.setOnClickListener(fistview ->{
+                btnFirst.setOnClickListener(fistview -> {
                     Toast.makeText(getApplicationContext(), "Selected First", Toast.LENGTH_LONG).show();
                 });
 
                 btnSetting = findViewById(R.id.second);
-                btnSetting.setOnClickListener(fistview ->{
+                btnSetting.setOnClickListener(fistview -> {
                     Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
                     startActivity(intent);
                 });
 
                 btnThird = findViewById(R.id.third);
-                btnThird.setOnClickListener(fistview ->{
+                btnThird.setOnClickListener(fistview -> {
                     Toast.makeText(getApplicationContext(), "Selected Third", Toast.LENGTH_LONG).show();
                 });
             } else {
                 ll.startAnimation(animClose);
-                ((ViewManager)ll.getParent()).removeView(ll);
+                ((ViewManager) ll.getParent()).removeView(ll);
                 state.set(0);
             }
         });
 
         mainActivity.setOnClickListener(view -> {
-            if(state.get() == 1){
+            if (state.get() == 1) {
                 ll.startAnimation(animClose);
-                ((ViewManager)ll.getParent()).removeView(ll);
+                ((ViewManager) ll.getParent()).removeView(ll);
                 state.set(0);
             }
         });
 
-        sendButton.setOnClickListener((v)->{
+        // chat
+        sendButton.setOnClickListener((v) -> {
             String question = messageEditText.getText().toString().trim();
 
             if (question.length() == 0) {
@@ -198,10 +212,12 @@ public class MainActivity extends AppCompatActivity {
                 messageEditText.setText("");
                 blockEdit(false);
                 try {
-                    callAPI(question);
+                    callChatAPI(question);
+                    callModAPI(question);
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
+                System.out.println(messagesArray);
                 welcomeTextView.setVisibility(View.GONE);
             }
         });
@@ -215,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
         sendButton.setClickable(bool);
     }
 
-    void addToChat(String message, String sentBy){
+    void addToChat(String message, String sentBy) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -227,29 +243,50 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    void addResponse(String response){
-        messageList.remove(messageList.size()-1);
+    void addResponse(String response) {
+        messageList.remove(messageList.size() - 1);
         addToChat(response, Message.SENT_BY_BOT);
     }
 
-    void callAPI(String question) throws JSONException {
+    void callChatAPI(String question) throws JSONException {
+
+        if (messagesArray.length() == 0) {
+            messageObject = new JSONObject();
+            messageObject.put("role", "system");
+            messageObject.put("content", userName + " is talking with you. " +
+                    "And your name is Buddy. So introduce yourself as Buddy in first time. " +
+                    "She is your best friend. Use friendly tone and speak informally.");
+            messagesArray.put(messageObject);
+        }
+
         //okhttp
         messageList.add(new Message("입력 중... ", Message.SENT_BY_BOT));
 
-        JSONArray messagesArray = new JSONArray();
-        JSONObject messageObject = new JSONObject();
+        messageObject = new JSONObject();
         messageObject.put("role", "user");
         messageObject.put("content", question);
         messagesArray.put(messageObject);
 
+        System.out.println(messagesArray);
+
+        String jsonString = messagesArray.toString();
+        int jsonLength = jsonString.length();
+        System.out.println(jsonLength);
+
+        if (jsonLength >= MAX_MESSAGE_COUNT) {
+            while (messagesArray.length() > 5) {
+                messagesArray.remove(1);
+            }
+        }
+
         JSONObject jsonBody = new JSONObject();
         try {
-            jsonBody.put("model","gpt-3.5-turbo");
+            jsonBody.put("model", "gpt-3.5-turbo");
             //jsonBody.put("model","text-davinci-003");
             jsonBody.put("messages", messagesArray);
             //jsonBody.put("prompt", question);
-            jsonBody.put("max_tokens",1000);
-            jsonBody.put("temperature",1.2);
+            jsonBody.put("max_tokens", 2048);
+            jsonBody.put("temperature", 1);
             jsonBody.put("frequency_penalty", 1);
             jsonBody.put("presence_penalty", 1);
         } catch (JSONException e) {
@@ -259,32 +296,109 @@ public class MainActivity extends AppCompatActivity {
         Request request = new Request.Builder()
                 .url("https://api.openai.com/v1/chat/completions")
                 //.url("https://api.openai.com/v1/completions")
-                .header("Authorization","Bearer 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")
+                .header("Authorization", "Bearer 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")
                 .post(body)
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                addResponse("Failed to load response due to "+e.getMessage());
+                addResponse("Failed to load response due to " + e.getMessage());
+                messagesArray.remove(messagesArray.length() - 1);
             }
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                if(response.isSuccessful()){
-                    JSONObject  jsonObject = null;
+                if (response.isSuccessful()) {
+                    JSONObject jsonObject = null;
                     try {
                         jsonObject = new JSONObject(response.body().string());
                         JSONArray jsonArray = jsonObject.getJSONArray("choices");
                         String result = jsonArray.getJSONObject(0).getJSONObject("message").getString("content");
                         addResponse(result.trim());
+
+                        JSONObject resMessageObject = new JSONObject();
+                        resMessageObject.put("role", "assistant");
+                        resMessageObject.put("content", result.trim());
+                        messagesArray.put(resMessageObject);
+
+                        String finish = jsonArray.getJSONObject(0).getString("finish_reason");
+                        System.out.println("finish: " + finish.trim());
+
+
+                        System.out.println("usage: " + jsonObject.getJSONObject("usage"));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                }else{
-                    addResponse("Failed to load response due to "+response.body().string());
+                } else {
+                    addResponse("Failed to load response due to " + response.body().string());
+                    messagesArray.remove(messagesArray.length() - 1);
                 }
             }
         });
     }
+
+    void callModAPI(String question) throws JSONException {
+
+        JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("input", question);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        RequestBody body = RequestBody.create(jsonBody.toString(), JSON);
+        Request request = new Request.Builder()
+                .url("https://api.openai.com/v1/moderations")
+                .header("Authorization", "Bearer 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")
+                .post(body)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                System.out.println("Failed to load response due to " + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    JSONObject jsonObject = null;
+                    try {
+                        jsonObject = new JSONObject(response.body().string());
+                        JSONArray jsonArray = jsonObject.getJSONArray("results");
+
+                        //String result = jsonArray.getJSONObject(0).getJSONObject("category_scores").getString("self-harm");
+                        //double score = Double.parseDouble(result.trim());
+                        //System.out.println("score: " + score);
+
+                        String result = jsonArray.getJSONObject(0).getJSONObject("categories").getString("self-harm");
+                        System.out.println("t/f: " + result.trim());
+
+                        if (result == "true") {
+                            selfHarm++;
+                        }
+
+                        System.out.println(selfHarm);
+
+                        if (selfHarm > 2) {
+                            messageObject = new JSONObject();
+                            messageObject.put("role", "system");
+                            messageObject.put("content", "Have a deep conversation with her before recommend a counseling center. " +
+                                    "However, if she is about to self-harm, recommend a consultation with an expert. " +
+                                    "Let her know that the suicide prevention consultation call is '1393'.");
+                            messagesArray.put(messageObject);
+                            selfHarm = 0;
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    System.out.println("Failed to load response due to " + response.body().string());
+                    messagesArray.remove(messagesArray.length() - 1);
+                }
+            }
+        });
+    }
+
 }

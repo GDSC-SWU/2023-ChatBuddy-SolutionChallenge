@@ -6,10 +6,10 @@ plugins {
 android {
     signingConfigs {
         release {
-            storeFile file('C:\\Users\\User\\Desktop\\Github\\2023-ChatBuddy-SolutionChallenge\\key\\chatbuddy.jks')
-            storePassword 'gdsc2023'
-            keyAlias 'CHATBuddy'
-            keyPassword 'gdsc2023'
+            storeFile file('chatbuddy.jks')
+            storePassword "gdsc2023"
+            keyAlias "CHATBuddy"
+            keyPassword "gdsc2023"
         }
     }
     namespace 'com.example.chatbuddy'
