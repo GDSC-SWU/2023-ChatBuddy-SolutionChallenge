@@ -4,6 +4,10 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -53,7 +57,7 @@ public class MindMapActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mind_map);
 
-        CloudView = findViewById(R.id.cloudView);
+        //CloudView = findViewById(R.id.cloudView);
 
         // Firebase 인증 객체 초기화
         mAuth = FirebaseAuth.getInstance();
@@ -98,6 +102,20 @@ public class MindMapActivity extends AppCompatActivity {
                 Log.w("TAG", "loadPost:onCancelled", databaseError.toException());
             }
         });
+
+        Animation pop = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.anim_pop);
+
+        ViewGroup layout = findViewById(R.id.MindMapActivity);
+        for (int i = 0; i < layout.getChildCount(); i++) {
+            View child = layout.getChildAt(i);
+            child.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    v.startAnimation(pop);
+                    child.setVisibility(View.GONE);
+                }
+            });
+        }
     }
 
 
@@ -165,7 +183,7 @@ public class MindMapActivity extends AppCompatActivity {
 
         Bitmap generatedWordCloudBmp = wd.generate();
 
-        CloudView.setImageBitmap(generatedWordCloudBmp);
+        //CloudView.setImageBitmap(generatedWordCloudBmp);
     }
 
 
