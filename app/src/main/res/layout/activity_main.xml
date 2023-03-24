@@ -113,8 +113,7 @@
                 android:layout_toLeftOf="@id/send_btn"
                 android:background="@drawable/rounded_corner"
                 android:hint="메세지를 입력해주세요."
-                android:padding="16dp"
-                android:maxLength="80"/>
+                android:padding="16dp" />
 
             <ImageButton
                 android:layout_width="48dp"

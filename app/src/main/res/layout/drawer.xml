@@ -75,7 +75,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="내가 해결해낸 것들"
+                    android:text="마음 지도"
                     android:padding="20dp"
                     android:textSize="16sp"
                     android:layout_gravity="center"/>

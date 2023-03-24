@@ -2,9 +2,6 @@ package com.example.chatbuddy;
 
 import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -59,8 +56,8 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout mainActivity, btnFirst, btnSetting, btnThird;
 
     // firebase authentication
-    private GoogleSignInClient mGoogleSignInClient;
-    private FirebaseAuth mAuth;
+    GoogleSignInClient mGoogleSignInClient;
+    FirebaseAuth mAuth;
     FirebaseUser currentUser;
 
     // realtime database
@@ -75,19 +72,14 @@ public class MainActivity extends AppCompatActivity {
     ImageButton sendButton;
     List<Message> messageList;
     MessageAdapter messageAdapter;
-    public static final MediaType JSON
+    public final MediaType JSON
             = MediaType.get("application/json; charset=utf-8");
     OkHttpClient client = new OkHttpClient();
     String userName;
     JSONArray messagesArray;
     JSONObject messageObject;
-    private final int MAX_MESSAGE_COUNT = 1000; // 최대 메시지 수
+    final int MAX_MESSAGE_COUNT = 1000; // 최대 메시지 수
     int selfHarm;
-
-    // gps
-    LocationManager locationManager;
-    Location location;
-    LocationListener gpsLocationListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -173,7 +165,8 @@ public class MainActivity extends AppCompatActivity {
 
                 btnFirst = findViewById(R.id.first);
                 btnFirst.setOnClickListener(fistview -> {
-                    Toast.makeText(getApplicationContext(), "Selected First", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(getApplicationContext(), MindMapActivity.class);
+                    startActivity(intent);
                 });
 
                 btnSetting = findViewById(R.id.second);
@@ -265,6 +258,8 @@ public class MainActivity extends AppCompatActivity {
         messageObject = new JSONObject();
         messageObject.put("role", "user");
         messageObject.put("content", question);
+
+        userRef.child(currentUser.getUid()).child("chat").child("user").child(String.valueOf(System.currentTimeMillis())).setValue(question);
         messagesArray.put(messageObject);
 
         System.out.println(messagesArray);
@@ -274,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
         System.out.println(jsonLength);
 
         if (jsonLength >= MAX_MESSAGE_COUNT) {
-            while (messagesArray.length() > 5) {
+            while (messagesArray.length() > 3) {
                 messagesArray.remove(1);
             }
         }
@@ -282,9 +277,7 @@ public class MainActivity extends AppCompatActivity {
         JSONObject jsonBody = new JSONObject();
         try {
             jsonBody.put("model", "gpt-3.5-turbo");
-            //jsonBody.put("model","text-davinci-003");
             jsonBody.put("messages", messagesArray);
-            //jsonBody.put("prompt", question);
             jsonBody.put("max_tokens", 2048);
             jsonBody.put("temperature", 1);
             jsonBody.put("frequency_penalty", 1);
@@ -295,8 +288,7 @@ public class MainActivity extends AppCompatActivity {
         RequestBody body = RequestBody.create(jsonBody.toString(), JSON);
         Request request = new Request.Builder()
                 .url("https://api.openai.com/v1/chat/completions")
-                //.url("https://api.openai.com/v1/completions")
-                .header("Authorization", "Bearer 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")
+                .header("Authorization", "Bearer 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")
                 .post(body)
                 .build();
 
@@ -320,6 +312,7 @@ public class MainActivity extends AppCompatActivity {
                         JSONObject resMessageObject = new JSONObject();
                         resMessageObject.put("role", "assistant");
                         resMessageObject.put("content", result.trim());
+                        userRef.child(currentUser.getUid()).child("chat").child("assistant").child(String.valueOf(System.currentTimeMillis())).setValue(result.trim());
                         messagesArray.put(resMessageObject);
 
                         String finish = jsonArray.getJSONObject(0).getString("finish_reason");
@@ -349,7 +342,7 @@ public class MainActivity extends AppCompatActivity {
         RequestBody body = RequestBody.create(jsonBody.toString(), JSON);
         Request request = new Request.Builder()
                 .url("https://api.openai.com/v1/moderations")
-                .header("Authorization", "Bearer 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")
+                .header("Authorization", "Bearer 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")
                 .post(body)
                 .build();
 

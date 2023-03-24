@@ -4,14 +4,6 @@ plugins {
 }
 
 android {
-    signingConfigs {
-        release {
-            storeFile file('chatbuddy.jks')
-            storePassword "gdsc2023"
-            keyAlias "CHATBuddy"
-            keyPassword "gdsc2023"
-        }
-    }
     namespace 'com.example.chatbuddy'
     compileSdk 33
 
@@ -69,4 +61,7 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+    implementation group: 'org.apache.opennlp', name: 'opennlp-tools', version: '1.9.3'
+    implementation files('libs/kkma-2.1.jar')
 }
