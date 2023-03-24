@@ -6,8 +6,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,6 +29,7 @@ import org.snu.ids.kkma.ma.MExpression;
 import org.snu.ids.kkma.ma.MorphemeAnalyzer;
 import org.snu.ids.kkma.ma.Sentence;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -37,6 +38,8 @@ import java.util.List;
 import java.util.Map;
 
 public class MindMapActivity extends AppCompatActivity {
+    ImageButton btnBack;
+
     // firebase authentication
     GoogleSignInClient mGoogleSignInClient;
     FirebaseAuth mAuth;
@@ -49,15 +52,21 @@ public class MindMapActivity extends AppCompatActivity {
 
     static ImageView CloudView;
 
+    static ViewGroup layout;
     StringBuilder builder;
     Map<String, Integer> freq;
+    List<Map.Entry<String, Integer>> entryList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mind_map);
 
-        //CloudView = findViewById(R.id.cloudView);
+        // 버튼
+        btnBack = findViewById(R.id.btnBack);
+        //layout = findViewById(R.id.MindMapActivity);
+
+        CloudView = findViewById(R.id.cloudView);
 
         // Firebase 인증 객체 초기화
         mAuth = FirebaseAuth.getInstance();
@@ -69,6 +78,14 @@ public class MindMapActivity extends AppCompatActivity {
         uidRef = userRef.child(currentUser.getUid());
         chatRef = uidRef.child("chat");
         builder = new StringBuilder();
+
+        // 뒤로가기
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
 
         chatRef.child("user").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -93,8 +110,10 @@ public class MindMapActivity extends AppCompatActivity {
                     }
                 }
 
-                draw(freq);
                 //extractAnal(builder.toString());
+                draw(freq);
+                //Map<String, Integer> sortedMap = sortByValue(freq);
+                //changeText(sortedMap);
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -103,23 +122,40 @@ public class MindMapActivity extends AppCompatActivity {
             }
         });
 
-        Animation pop = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.anim_pop);
-
-        ViewGroup layout = findViewById(R.id.MindMapActivity);
+        /*
         for (int i = 0; i < layout.getChildCount(); i++) {
             View child = layout.getChildAt(i);
+            final Animation pop = AnimationUtils.loadAnimation(this, R.anim.anim_pop);
             child.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     v.startAnimation(pop);
-                    child.setVisibility(View.GONE);
+                    child.setEnabled(false);
                 }
             });
         }
+        */
+
     }
 
+    public static void changeText(Map<String, Integer> sortedMap) {
+        List<String> topKeys = new ArrayList<>(); // 상위 7개의 key를 담을 List
+        int count = 0;
+        for (Map.Entry<String, Integer> entry : sortedMap.entrySet()) {
+            if (count >= 7) { // 7개 이상이면 루프를 종료합니다.
+                break;
+            }
+            topKeys.add(entry.getKey()); // 상위 key를 List에 추가합니다.
+            count++;
+        }
 
 
+        for (int i = 0; i < layout.getChildCount(); i++) {
+            Button child = (Button) layout.getChildAt(i);
+
+            child.setText(topKeys.get(i));
+        }
+    }
 
     public static void formAnal()
     {
@@ -148,19 +184,20 @@ public class MindMapActivity extends AppCompatActivity {
         String string = sentence;
         KeywordExtractor ke = new KeywordExtractor();
         KeywordList kl = ke.extractKeyword(string, true);
-        Map<String, Integer> freq = new HashMap<>();
+        Map<String, Integer> aFreq = new HashMap<>();
 
         for( int i = 0; i < kl.size(); i++ ){
             Keyword kwrd = kl.get(i);
             System.out.println(kwrd.getString() + "\t" + kwrd.getCnt());
 
             System.out.println(kwrd.getCnt());
-            freq.put(kwrd.getString(), kwrd.getCnt());
+            aFreq.put(kwrd.getString(), kwrd.getCnt());
         }
 
-        Map<String, Integer> sortedMap = sortByValue(freq);
+        Map<String, Integer> sortedMap = sortByValue(aFreq);
 
-        draw(sortedMap);
+        changeText(sortedMap);
+        //draw(sortedMap);
     }
 
     // Map을 Value 값으로 정렬
@@ -182,8 +219,7 @@ public class MindMapActivity extends AppCompatActivity {
         wd.setPaddingY(5);
 
         Bitmap generatedWordCloudBmp = wd.generate();
-
-        //CloudView.setImageBitmap(generatedWordCloudBmp);
+        CloudView.setImageBitmap(generatedWordCloudBmp);
     }
 
 
