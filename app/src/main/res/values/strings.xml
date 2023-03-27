@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">chatbuddy</string>
     <string name="web_client_id">312507382741-f6im5mnthovp8vklk08qt64vrguhrjpa.apps.googleusercontent.com</string>
+    <string name="openai_api_key">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</string>
     <string name="signOut">로그아웃</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

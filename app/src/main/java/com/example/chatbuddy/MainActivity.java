@@ -241,29 +241,8 @@ public class MainActivity extends AppCompatActivity {
         addToChat(response, Message.SENT_BY_BOT);
     }
 
-    void callChatAPI(String question) throws JSONException {
-
-        if (messagesArray.length() == 0) {
-            messageObject = new JSONObject();
-            messageObject.put("role", "system");
-            messageObject.put("content", userName + " is talking with you. " +
-                    "And your name is Buddy. So introduce yourself as Buddy in first time. " +
-                    "She is your best friend. Use friendly tone and speak informally.");
-            messagesArray.put(messageObject);
-        }
-
-        //okhttp
-        messageList.add(new Message("입력 중... ", Message.SENT_BY_BOT));
-
-        messageObject = new JSONObject();
-        messageObject.put("role", "user");
-        messageObject.put("content", question);
-
-        userRef.child(currentUser.getUid()).child("chat").child("user").child(String.valueOf(System.currentTimeMillis())).setValue(question);
-        messagesArray.put(messageObject);
-
-        System.out.println(messagesArray);
-
+    /*
+    void embedding() {
         String jsonString = messagesArray.toString();
         int jsonLength = jsonString.length();
         System.out.println(jsonLength);
@@ -276,7 +255,7 @@ public class MainActivity extends AppCompatActivity {
 
         JSONObject jsonBody = new JSONObject();
         try {
-            jsonBody.put("model", "gpt-3.5-turbo");
+            jsonBody.put("input", "gpt-3.5-turbo");
             jsonBody.put("messages", messagesArray);
             jsonBody.put("max_tokens", 2048);
             jsonBody.put("temperature", 1);
@@ -288,7 +267,7 @@ public class MainActivity extends AppCompatActivity {
         RequestBody body = RequestBody.create(jsonBody.toString(), JSON);
         Request request = new Request.Builder()
                 .url("https://api.openai.com/v1/chat/completions")
-                .header("Authorization", "Bearer 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")
+                .header("Authorization", "Bearer " + getString(R.string.openai_api_key))
                 .post(body)
                 .build();
 
@@ -330,6 +309,94 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+     */
+
+    void callChatAPI(String question) throws JSONException {
+
+        if (messagesArray.length() == 0) {
+            messageObject = new JSONObject();
+            messageObject.put("role", "system");
+            messageObject.put("content", userName + " is talking with you. " +
+                    userName + " is your best friend. And your name is Buddy. So introduce yourself as Buddy in first time. " +
+                    "Use friendly tone and speak informally." +
+                    "If user says something negative repeatedly, asks if user wants help.");
+            messagesArray.put(messageObject);
+        }
+
+        //okhttp
+        messageList.add(new Message("입력 중... ", Message.SENT_BY_BOT));
+
+        messageObject = new JSONObject();
+        messageObject.put("role", "user");
+        messageObject.put("content", question);
+
+        userRef.child(currentUser.getUid()).child("chat").child("user").child(String.valueOf(System.currentTimeMillis())).setValue(question);
+        messagesArray.put(messageObject);
+
+        String jsonString = messagesArray.toString();
+        int jsonLength = jsonString.length();
+        System.out.println(jsonLength + ": " + jsonString);
+
+        JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("model", "gpt-3.5-turbo");
+            jsonBody.put("messages", messagesArray);
+            jsonBody.put("max_tokens", 300);
+            jsonBody.put("temperature", 0.8);
+            jsonBody.put("frequency_penalty", 1);
+            jsonBody.put("presence_penalty", 1);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        RequestBody body = RequestBody.create(jsonBody.toString(), JSON);
+        Request request = new Request.Builder()
+                .url("https://api.openai.com/v1/chat/completions")
+                .header("Authorization", "Bearer " + getString(R.string.openai_api_key))
+                .post(body)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                addResponse("Failed to load response due to " + e.getMessage());
+                messagesArray.remove(messagesArray.length() - 1);
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    JSONObject jsonObject = null;
+                    try {
+                        jsonObject = new JSONObject(response.body().string());
+                        JSONArray jsonArray = jsonObject.getJSONArray("choices");
+                        String result = jsonArray.getJSONObject(0).getJSONObject("message").getString("content");
+                        addResponse(result.trim());
+
+                        JSONObject resMessageObject = new JSONObject();
+                        resMessageObject.put("role", "assistant");
+                        resMessageObject.put("content", result.trim());
+                        userRef.child(currentUser.getUid()).child("chat").child("assistant").child(String.valueOf(System.currentTimeMillis())).setValue(result.trim());
+                        messagesArray.put(resMessageObject);
+
+                        String finish = jsonArray.getJSONObject(0).getString("finish_reason");
+                        System.out.println("finish: " + finish.trim());
+
+                        if (Integer.parseInt(jsonObject.getJSONObject("usage").getString("total_tokens")) > 300) {
+                            while (messagesArray.length() > 3) {
+                                messagesArray.remove(1);
+                            }
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    addResponse("Failed to load response due to " + response.body().string());
+                    messagesArray.remove(messagesArray.length() - 1);
+                }
+            }
+        });
+    }
 
     void callModAPI(String question) throws JSONException {
 
@@ -342,7 +409,7 @@ public class MainActivity extends AppCompatActivity {
         RequestBody body = RequestBody.create(jsonBody.toString(), JSON);
         Request request = new Request.Builder()
                 .url("https://api.openai.com/v1/moderations")
-                .header("Authorization", "Bearer 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")
+                .header("Authorization", "Bearer " + getString(R.string.openai_api_key))
                 .post(body)
                 .build();
 
@@ -365,7 +432,7 @@ public class MainActivity extends AppCompatActivity {
                         //System.out.println("score: " + score);
 
                         String result = jsonArray.getJSONObject(0).getJSONObject("categories").getString("self-harm");
-                        System.out.println("t/f: " + result.trim());
+                        System.out.println("self-harm t/f: " + result.trim());
 
                         if (result == "true") {
                             selfHarm++;
