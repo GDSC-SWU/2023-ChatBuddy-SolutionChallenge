@@ -21,6 +21,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -72,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
     ImageButton sendButton;
     List<Message> messageList;
     MessageAdapter messageAdapter;
+    String openai_api_key;
     public final MediaType JSON
             = MediaType.get("application/json; charset=utf-8");
     OkHttpClient client = new OkHttpClient();
@@ -137,6 +140,20 @@ public class MainActivity extends AppCompatActivity {
         welcomeTextView = findViewById(R.id.welcome_text);
         messageEditText = findViewById(R.id.message_edit_text);
         sendButton = findViewById(R.id.send_btn);
+
+        // api key
+        database.getReference("api_key").child("open_ai").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (!task.isSuccessful()) {
+                    Log.e("firebase", "Error getting data", task.getException());
+                }
+                else {
+                    Log.d("firebase", String.valueOf(task.getResult().getValue()));
+                    openai_api_key = String.valueOf(task.getResult().getValue());
+                }
+            }
+        });
 
         messageList = new ArrayList<>();
         messagesArray = new JSONArray();
@@ -210,7 +227,6 @@ public class MainActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
-                System.out.println(messagesArray);
                 welcomeTextView.setVisibility(View.GONE);
             }
         });
@@ -312,7 +328,6 @@ public class MainActivity extends AppCompatActivity {
      */
 
     void callChatAPI(String question) throws JSONException {
-
         if (messagesArray.length() == 0) {
             messageObject = new JSONObject();
             messageObject.put("role", "system");
@@ -341,17 +356,18 @@ public class MainActivity extends AppCompatActivity {
         try {
             jsonBody.put("model", "gpt-3.5-turbo");
             jsonBody.put("messages", messagesArray);
-            jsonBody.put("max_tokens", 300);
+            jsonBody.put("max_tokens", 150);
             jsonBody.put("temperature", 0.8);
             jsonBody.put("frequency_penalty", 1);
             jsonBody.put("presence_penalty", 1);
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
         RequestBody body = RequestBody.create(jsonBody.toString(), JSON);
         Request request = new Request.Builder()
                 .url("https://api.openai.com/v1/chat/completions")
-                .header("Authorization", "Bearer " + getString(R.string.openai_api_key))
+                .header("Authorization", "Bearer " + openai_api_key)
                 .post(body)
                 .build();
 
@@ -381,7 +397,9 @@ public class MainActivity extends AppCompatActivity {
                         String finish = jsonArray.getJSONObject(0).getString("finish_reason");
                         System.out.println("finish: " + finish.trim());
 
-                        if (Integer.parseInt(jsonObject.getJSONObject("usage").getString("total_tokens")) > 300) {
+                        System.out.println("total usage: " + Integer.parseInt(jsonObject.getJSONObject("usage").getString("total_tokens")));
+
+                        if (Integer.parseInt(jsonObject.getJSONObject("usage").getString("total_tokens")) > 280) {
                             while (messagesArray.length() > 3) {
                                 messagesArray.remove(1);
                             }
@@ -409,7 +427,7 @@ public class MainActivity extends AppCompatActivity {
         RequestBody body = RequestBody.create(jsonBody.toString(), JSON);
         Request request = new Request.Builder()
                 .url("https://api.openai.com/v1/moderations")
-                .header("Authorization", "Bearer " + getString(R.string.openai_api_key))
+                .header("Authorization", "Bearer " + openai_api_key)
                 .post(body)
                 .build();
 
