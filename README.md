@@ -1,1 +1,2 @@
-# 2023-ChatBuddy-SolutionChallenge
+# 🫂 CHATBuddy 챗벗
+## 2023-ChatBuddy-SolutionChallenge
