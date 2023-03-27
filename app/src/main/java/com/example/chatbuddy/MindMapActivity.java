@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -30,6 +32,7 @@ import org.snu.ids.kkma.ma.MorphemeAnalyzer;
 import org.snu.ids.kkma.ma.Sentence;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -54,6 +57,8 @@ public class MindMapActivity extends AppCompatActivity {
 
     static ViewGroup layout;
     StringBuilder builder;
+    String words[];
+    ArrayList<String> wordsList;
     Map<String, Integer> freq;
     List<Map.Entry<String, Integer>> entryList;
 
@@ -64,9 +69,9 @@ public class MindMapActivity extends AppCompatActivity {
 
         // 버튼
         btnBack = findViewById(R.id.btnBack);
-        //layout = findViewById(R.id.MindMapActivity);
+        layout = findViewById(R.id.MindMapActivity);
 
-        CloudView = findViewById(R.id.cloudView);
+        //CloudView = findViewById(R.id.cloudView);
 
         // Firebase 인증 객체 초기화
         mAuth = FirebaseAuth.getInstance();
@@ -87,22 +92,28 @@ public class MindMapActivity extends AppCompatActivity {
             }
         });
 
+        ArrayList<String> wordsList = new ArrayList<>();
         chatRef.child("user").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // uid 노드의 모든 데이터를 가져옴
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     String key = snapshot.getKey(); // 하위 노드의 키값을 가져옴
-                    Object value = snapshot.getValue(); // 하위 노드의 값을 가져옴
+                    String value = snapshot.getValue(String.class); // 하위 노드의 값을 가져옴
 
-                    builder.append(value.toString());
-                    builder.append(" ");
+                    //builder.append(value.toString());
+                    //builder.append(" ");
+
+                    words = value.split(" ");
+                    System.out.println("words: " + words);
+                    wordsList.addAll(Arrays.asList(words));
+                    System.out.println("wordsList: " + wordsList);
                 }
 
-                String[] words = builder.toString().split(" ");
+                //String[] words = builder.toString().split(" ");
                 freq = new HashMap<>();
                 // 배열을 반복하면서 각 원소의 등장 횟수를 계산합니다.
-                for (String element : words) {
+                for (String element : wordsList) {
                     if (freq.containsKey(element)) {
                         freq.put(element, freq.get(element) + 1);
                     } else {
@@ -110,10 +121,14 @@ public class MindMapActivity extends AppCompatActivity {
                     }
                 }
 
+                System.out.println("freq: " + freq);
+
                 //extractAnal(builder.toString());
-                draw(freq);
-                //Map<String, Integer> sortedMap = sortByValue(freq);
-                //changeText(sortedMap);
+                //draw(freq);
+                Map<String, Integer> sortedMap = sortByValue(freq);
+                System.out.println("sortedMap: " + sortedMap);
+
+                changeText(sortedMap);
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -122,7 +137,6 @@ public class MindMapActivity extends AppCompatActivity {
             }
         });
 
-        /*
         for (int i = 0; i < layout.getChildCount(); i++) {
             View child = layout.getChildAt(i);
             final Animation pop = AnimationUtils.loadAnimation(this, R.anim.anim_pop);
@@ -134,21 +148,18 @@ public class MindMapActivity extends AppCompatActivity {
                 }
             });
         }
-        */
-
     }
 
     public static void changeText(Map<String, Integer> sortedMap) {
         List<String> topKeys = new ArrayList<>(); // 상위 7개의 key를 담을 List
         int count = 0;
         for (Map.Entry<String, Integer> entry : sortedMap.entrySet()) {
-            if (count >= 7) { // 7개 이상이면 루프를 종료합니다.
+            if (count >= 10) {
                 break;
             }
             topKeys.add(entry.getKey()); // 상위 key를 List에 추가합니다.
             count++;
         }
-
 
         for (int i = 0; i < layout.getChildCount(); i++) {
             Button child = (Button) layout.getChildAt(i);
@@ -203,7 +214,7 @@ public class MindMapActivity extends AppCompatActivity {
     // Map을 Value 값으로 정렬
     public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
         List<Map.Entry<K, V>> list = new LinkedList<>(map.entrySet());
-        Collections.sort(list, (o1, o2) -> (o1.getValue()).compareTo(o2.getValue()));
+        Collections.sort(list, (o1, o2) -> (o2.getValue()).compareTo(o1.getValue()));
 
         Map<K, V> result = new LinkedHashMap<>();
         for (Map.Entry<K, V> entry : list) {

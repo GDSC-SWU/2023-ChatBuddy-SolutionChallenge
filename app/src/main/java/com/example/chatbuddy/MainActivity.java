@@ -356,7 +356,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             jsonBody.put("model", "gpt-3.5-turbo");
             jsonBody.put("messages", messagesArray);
-            jsonBody.put("max_tokens", 150);
+            jsonBody.put("max_tokens", 200);
             jsonBody.put("temperature", 0.8);
             jsonBody.put("frequency_penalty", 1);
             jsonBody.put("presence_penalty", 1);
@@ -399,8 +399,11 @@ public class MainActivity extends AppCompatActivity {
 
                         System.out.println("total usage: " + Integer.parseInt(jsonObject.getJSONObject("usage").getString("total_tokens")));
 
-                        if (Integer.parseInt(jsonObject.getJSONObject("usage").getString("total_tokens")) > 280) {
-                            while (messagesArray.length() > 3) {
+                        if (Integer.parseInt(jsonObject.getJSONObject("usage").getString("total_tokens")) > 300) {
+                            String jsonString = messagesArray.toString();
+                            int jsonLength = jsonString.length();
+
+                            while (jsonLength > 500) {
                                 messagesArray.remove(1);
                             }
                         }
