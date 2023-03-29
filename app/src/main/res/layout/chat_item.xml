@@ -2,22 +2,22 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="8dp">
+    android:padding="15dp">
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/left_chat_view"
         android:background="@drawable/rounded_corner"
-        android:backgroundTint="@color/sub_gray"
-        android:padding="8dp"
+        android:backgroundTint="#2A2C32"
+        android:padding="10dp"
         android:layout_marginEnd="80dp" >
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/left_chat_text_view"
             android:textColor="@color/white"
-            android:textSize="18sp" />
+            android:textSize="16sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -26,15 +26,15 @@
         android:id="@+id/right_chat_view"
         android:layout_alignParentEnd="true"
         android:background="@drawable/rounded_corner"
-        android:backgroundTint="@color/main_green"
-        android:padding="8dp"
+        android:backgroundTint="#3B3D46"
+        android:padding="10dp"
         android:layout_marginStart="80dp" >
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/right_chat_text_view"
             android:textColor="@color/white"
-            android:textSize="18sp" />
+            android:textSize="16sp" />
     </LinearLayout>
 
 </RelativeLayout>

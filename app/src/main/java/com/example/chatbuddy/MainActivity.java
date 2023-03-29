@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        });
 
-        btnNext = (ImageButton) findViewById(R.id.btnNext);
+        btnNext = findViewById(R.id.btnNext);
         final int[] fState = {1};
 
         btnNext.setOnClickListener(new View.OnClickListener() {
@@ -162,11 +162,11 @@ public class MainActivity extends AppCompatActivity {
                 if(fState[0] ==1){
                     callFragment(2);
                     fState[0] = 2;
-                    btnNext.setBackgroundResource(R.drawable.btn_solution);
+                    btnNext.setImageResource(R.drawable.btn_solution);
                 } else if (fState[0] ==2) {
                     callFragment(1);
                     fState[0] = 1;
-                    btnNext.setBackgroundResource(R.drawable.btn_chat);
+                    btnNext.setImageResource(R.drawable.btn_chat);
                 }
             }
         });

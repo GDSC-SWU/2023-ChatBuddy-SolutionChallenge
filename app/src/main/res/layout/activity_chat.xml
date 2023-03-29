@@ -38,13 +38,14 @@
             <ImageView
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:src="@drawable/splash1"/>
+                android:src="@drawable/splash1"
+                android:layout_gravity="center"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Chu_ddy"
-                android:textSize="8sp"/>
+                android:textSize="11sp"/>
 
         </LinearLayout>
 
@@ -66,35 +67,40 @@
             android:id="@+id/recycler_view"
             android:layout_above="@id/bottom_layout" />
 
-        <RelativeLayout
+        <FrameLayout
+            android:id="@+id/bottom_layout"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="92dp"
             android:layout_alignParentBottom="true"
-            android:padding="8dp"
-            android:id="@+id/bottom_layout">
+            android:gravity="bottom">
 
             <EditText
                 android:id="@+id/message_edit_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="370dp"
+                android:layout_height="55dp"
                 android:layout_centerInParent="true"
                 android:layout_toLeftOf="@id/send_btn"
                 android:background="@drawable/rounded_corner"
-                android:hint="메세지를 입력해주세요."
+                android:backgroundTint="#3A3D47"
+                android:layout_gravity="center"
+                android:hint="고민을 적어주세요"
+                android:textColorHint="#D9D9D9"
+                android:textSize="16sp"
+                android:textColor="@color/white"
                 android:padding="16dp" />
 
             <ImageButton
-                android:layout_width="48dp"
-                android:layout_height="48dp"
                 android:id="@+id/send_btn"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
                 android:layout_alignParentEnd="true"
                 android:layout_centerInParent="true"
-                android:layout_marginStart="10dp"
-                android:padding="8dp"
-                android:src="@drawable/ic_baseline_send"
-                android:background="?attr/selectableItemBackgroundBorderless"  />
+                android:layout_gravity="right|center_vertical"
+                android:layout_marginRight="35dp"
+                android:src="@drawable/btn_send"
+                android:background="@android:color/transparent"/>
 
-        </RelativeLayout>
+        </FrameLayout>
 
     </RelativeLayout>
 
