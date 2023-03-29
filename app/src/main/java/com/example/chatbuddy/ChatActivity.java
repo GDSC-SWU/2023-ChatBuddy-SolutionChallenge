@@ -1,6 +1,8 @@
 package com.example.chatbuddy;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
@@ -8,6 +10,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,20 +34,31 @@ import okhttp3.Response;
 
 public class ChatActivity extends AppCompatActivity {
 
+    FirebaseDatabase database;
     // chat
     RecyclerView recyclerView;
     EditText messageEditText;
-    ImageButton sendButton;
+    ImageButton sendButton, btnBack;
     List<Message> messageList;
     MessageAdapter messageAdapter;
     public static final MediaType JSON
             = MediaType.get("application/json; charset=utf-8");
     OkHttpClient client = new OkHttpClient();
 
+    String openai_api_key;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        database = FirebaseDatabase.getInstance();
+
+        btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) { finish(); }
+        });
 
         // chat
         messageList = new ArrayList<>();
@@ -69,6 +87,19 @@ public class ChatActivity extends AppCompatActivity {
                     callAPI(question);
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
+                }
+            }
+        });
+
+        database.getReference("api_key").child("open_ai").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (!task.isSuccessful()) {
+                    Log.e("firebase", "Error getting data", task.getException());
+                }
+                else {
+                    Log.d("firebase", String.valueOf(task.getResult().getValue()));
+                    openai_api_key = String.valueOf(task.getResult().getValue());
                 }
             }
         });
@@ -126,7 +157,7 @@ public class ChatActivity extends AppCompatActivity {
         Request request = new Request.Builder()
                 .url("https://api.openai.com/v1/chat/completions")
                 //.url("https://api.openai.com/v1/completions")
-                .header("Authorization","Bearer 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")
+                .header("Authorization", "Bearer " + openai_api_key)
                 .post(body)
                 .build();
 
