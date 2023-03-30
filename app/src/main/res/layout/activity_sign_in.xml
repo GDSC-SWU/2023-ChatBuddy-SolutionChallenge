@@ -48,25 +48,39 @@
         android:layout_width="6dp"
         android:layout_height="6dp"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="170dp"
+        android:layout_marginTop="190dp"
         android:background="#01ABB4"
         app:layout_constraintStart_toEndOf="@+id/textView2"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
+    <LinearLayout
         android:id="@+id/btnSignIn"
         android:layout_width="350dp"
         android:layout_height="60dp"
         android:layout_marginBottom="150dp"
-        android:textAllCaps="false"
         android:background="@drawable/round_button"
-        android:backgroundTint="@color/main_darkGray"
-        android:text="sign in with Google"
-        android:textSize="18sp"
+        android:backgroundTint="#292C33"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.491"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        android:gravity="center">
+
+        <ImageView
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:src="@drawable/icon_google"
+            android:layout_gravity="center"
+            android:layout_marginRight="10dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sign in with Google"
+            android:textSize="18sp"
+            android:layout_gravity="center"/>
+
+    </LinearLayout>
 
     <Button
         android:id="@+id/btnHelp"

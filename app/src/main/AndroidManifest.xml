@@ -5,7 +5,6 @@
     <uses-permission android:name="android.permission.INTERNET" /> <!-- 저장 파일에 접근하기 위한 퍼미션 설정 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -17,6 +16,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Chatbuddy"
         tools:targetApi="31">
+        <activity
+            android:name=".ChatActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TodoActivity"
+            android:exported="false" />
         <activity
             android:name=".MindMapActivity"
             android:exported="false" />

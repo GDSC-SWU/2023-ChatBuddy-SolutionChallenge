@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -32,7 +33,8 @@ import com.google.firebase.firestore.auth.User;
 
 public class SignInActivity extends AppCompatActivity {
 
-    Button btn_SignIn;
+    LinearLayout btn_SignIn;
+    Button btnHelp;
 
     // firebase authentication
     private static final int RC_SIGN_IN = 123;
@@ -109,6 +111,15 @@ public class SignInActivity extends AppCompatActivity {
                                 }
                             });
                 }
+            }
+        });
+
+        btnHelp = findViewById(R.id.btnHelp);
+        btnHelp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                BottomSheetDialog bottomSheetDialog = BottomSheetDialog.getInstance();
+                bottomSheetDialog.show(getSupportFragmentManager(),"bottomSheet");
             }
         });
     }
