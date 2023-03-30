@@ -71,47 +71,30 @@ public class SplashActivity extends AppCompatActivity {
 
     // 앱 시작 시 자동 로그인
     private void autoSignIn() {
-        currentUser = mAuth.getCurrentUser();
-
         if (currentUser == null) {
             // 로그아웃한 사람, 탈퇴한 사람
             Toast.makeText(getApplicationContext(), "로그인이 필요합니다.", Toast.LENGTH_SHORT).show();
             startSignInActivity();
         } else {
-            // 유효한 계정입니다.
-            // Firebase에서 해당 계정이 존재하는지 확인합니다.
-            String email = currentUser.getEmail();
-            mAuth.fetchSignInMethodsForEmail(email)
-                    .addOnCompleteListener(task -> {
-                        boolean isNewUser = task.getResult().getSignInMethods().isEmpty();
-                        if (isNewUser) {
-                            // authentication에 존재하지 않는 계정입니다.
-                            Toast.makeText(getApplicationContext(), "회원가입이 필요합니다.", Toast.LENGTH_SHORT).show();
-                            startSignUpActivity();
-                        } else {
-                            // authenticaiton에 존재하는 계정입니다.
-                            // realtime database로 더블체크
-                            String uid = currentUser.getUid();
-                            userRef.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    if (dataSnapshot.exists()) {
-                                        // uid가 존재하는 경우
-                                        signIn();
-                                    } else {
-                                        // uid가 존재하지 않는 경우
-                                        Toast.makeText(getApplicationContext(), "회원가입이 필요합니다.", Toast.LENGTH_SHORT).show();
-                                        startSignUpActivity();
-                                    }
-                                }
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-                                    // 쿼리가 취소된 경우
-                                    Toast.makeText(getApplicationContext(), "오류 발생", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }
-                    });
+            String uid = mAuth.getCurrentUser().getUid();
+            userRef.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        // uid가 존재하는 경우
+                        signIn();
+                    } else {
+                        // uid가 존재하지 않는 경우
+                        Toast.makeText(getApplicationContext(), "회원가입이 필요합니다.", Toast.LENGTH_SHORT).show();
+                        startSignUpActivity();
+                    }
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    // 쿼리가 취소된 경우
+                    Toast.makeText(getApplicationContext(), "오류 발생", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 

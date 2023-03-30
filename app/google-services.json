@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "312507382741-0o8um65b453bv1974na12cc8fr74sqf5.apps.googleusercontent.com",
+          "client_id": "312507382741-8973m997hfgl8r1a21r4s8ousgif48as.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.chatbuddy",
-            "certificate_hash": "b718b59a77262609cbecbfd1c98cca93b30caf7b"
+            "certificate_hash": "5889363098570a6291c08e8220771142c34e2b47"
           }
         },
         {
