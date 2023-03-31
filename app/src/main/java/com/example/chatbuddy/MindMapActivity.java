@@ -159,12 +159,6 @@ public class MindMapActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        setContentView(R.layout.activity_mind_map);
-    }
-
     public static void changeText(Map<String, Integer> sortedMap) {
         List<String> topKeys = new ArrayList<>(); // 상위 7개의 key를 담을 List
         int count = 0;
