@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    tools:context=".MainActivity"
+    android:id="@+id/mainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:orientation="horizontal"
+        android:gravity="left">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:background="@android:color/transparent"
+            app:srcCompat="@drawable/icon_back"
+            android:layout_gravity="center"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="3"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/splash1"
+                android:layout_gravity="center"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chu_ddy"
+                android:textSize="11sp"/>
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="4"/>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MainActivity">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/recycler_view"
+            android:layout_above="@id/bottom_layout" />
+
+        <FrameLayout
+            android:id="@+id/bottom_layout"
+            android:layout_width="match_parent"
+            android:layout_height="92dp"
+            android:layout_alignParentBottom="true"
+            android:gravity="bottom">
+
+            <EditText
+                android:id="@+id/message_edit_text"
+                android:layout_width="370dp"
+                android:layout_height="55dp"
+                android:layout_centerInParent="true"
+                android:layout_toLeftOf="@id/send_btn"
+                android:background="@drawable/rounded_corner"
+                android:backgroundTint="#3A3D47"
+                android:layout_gravity="center"
+                android:hint="고민을 적어주세요"
+                android:textColorHint="#D9D9D9"
+                android:textSize="16sp"
+                android:textColor="@color/white"
+                android:padding="16dp" />
+
+            <ImageButton
+                android:id="@+id/send_btn"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerInParent="true"
+                android:layout_gravity="right|center_vertical"
+                android:layout_marginRight="35dp"
+                android:src="@drawable/btn_send"
+                android:background="@android:color/transparent"/>
+
+        </FrameLayout>
+
+    </RelativeLayout>
+
+</LinearLayout>
