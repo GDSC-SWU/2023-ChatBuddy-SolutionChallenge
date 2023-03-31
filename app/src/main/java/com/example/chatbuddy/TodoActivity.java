@@ -12,7 +12,7 @@ import java.util.Locale;
 
 public class TodoActivity extends AppCompatActivity {
 
-    private static final long START_TIME_IN_MILLIS = 10000; // 카운트다운 시간 10초
+    private static final long START_TIME_IN_MILLIS = 600000; // 카운트다운 시간 10분
     ImageButton btnBack, btnStart, btnSetting, btnMusic;
     TextView tvTime, tvComplete;
 
