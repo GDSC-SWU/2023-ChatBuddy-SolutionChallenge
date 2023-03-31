@@ -153,7 +153,6 @@ public class SplashActivity extends AppCompatActivity {
                                             }
                                         }
                                     }
-
                                     @Override
                                     public void onCancelled(@NonNull DatabaseError error) {
                                         // 데이터베이스 액세스 중 오류 발생 시 처리 방법

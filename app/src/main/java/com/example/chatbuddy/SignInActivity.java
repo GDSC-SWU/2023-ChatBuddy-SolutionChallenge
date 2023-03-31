@@ -1,5 +1,6 @@
 package com.example.chatbuddy;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -44,7 +45,7 @@ public class SignInActivity extends AppCompatActivity {
 
     // realtime database
     FirebaseDatabase database;
-    DatabaseReference userRef;
+    DatabaseReference userRef, uidRef;
     User user;
 
     @Override
@@ -96,7 +97,6 @@ public class SignInActivity extends AppCompatActivity {
                                             if (dataSnapshot.exists()) {
                                                 // uid가 존재하는 경우
                                                 signIn();
-                                                Toast.makeText(getApplicationContext(), "로그인 성공", Toast.LENGTH_SHORT).show();
                                             } else {
                                                 // uid가 존재하지 않는 경우
                                                 Toast.makeText(getApplicationContext(), "회원가입이 필요합니다.", Toast.LENGTH_SHORT).show();
@@ -165,14 +165,32 @@ public class SignInActivity extends AppCompatActivity {
                             FirebaseUser firebaseUser = mAuth.getCurrentUser();
 
                             String uid = firebaseUser.getUid();
+                            uidRef = userRef.child(firebaseUser.getUid());
                             userRef.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     if (dataSnapshot.exists()) {
                                         // uid가 존재하는 경우
                                         if (firebaseUser != null) {
-                                            startMainActivity();
-                                            Toast.makeText(getApplicationContext(), "로그인 성공", Toast.LENGTH_SHORT).show();
+                                            uidRef.child("password").child("on").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                    if (snapshot.exists()) {
+                                                        Boolean on = snapshot.getValue(Boolean.class);
+                                                        if (on.equals(true)) {
+                                                            startPasswordActivity();
+                                                        } else if (on.equals(false)) {
+                                                            startMainActivity();
+                                                            Toast.makeText(getApplicationContext(), "로그인 성공", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }
+                                                }
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError error) {
+                                                    // 데이터베이스 액세스 중 오류 발생 시 처리 방법
+
+                                                }
+                                            });
                                         }
                                     } else {
                                         // uid가 존재하지 않는 경우
@@ -210,7 +228,13 @@ public class SignInActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-
+    private void startPasswordActivity() {
+        finishAffinity();
+        Intent intent = new Intent(getApplicationContext(), PasswordActivity.class);
+        intent.putExtra("preAct", "SignInActivity");
+        setResult(Activity.RESULT_OK, intent);
+        startActivity(intent);
+    }
 
 
     /*
