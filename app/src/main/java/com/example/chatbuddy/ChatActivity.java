@@ -160,32 +160,22 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     /*
-    void embedding() {
+    void embeddings() {
         String jsonString = messagesArray.toString();
         int jsonLength = jsonString.length();
         System.out.println(jsonLength);
 
-        if (jsonLength >= MAX_MESSAGE_COUNT) {
-            while (messagesArray.length() > 3) {
-                messagesArray.remove(1);
-            }
-        }
-
         JSONObject jsonBody = new JSONObject();
         try {
-            jsonBody.put("input", "gpt-3.5-turbo");
-            jsonBody.put("messages", messagesArray);
-            jsonBody.put("max_tokens", 2048);
-            jsonBody.put("temperature", 1);
-            jsonBody.put("frequency_penalty", 1);
-            jsonBody.put("presence_penalty", 1);
+            jsonBody.put("input", "text-embedding-ada-002");
+            jsonBody.put("input", messagesArray);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         RequestBody body = RequestBody.create(jsonBody.toString(), JSON);
         Request request = new Request.Builder()
-                .url("https://api.openai.com/v1/chat/completions")
-                .header("Authorization", "Bearer " + getString(R.string.openai_api_key))
+                .url("https://api.openai.com/v1/embeddings")
+                .header("Authorization", "Bearer " + openai_api_key)
                 .post(body)
                 .build();
 
@@ -193,7 +183,6 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 addResponse("Failed to load response due to " + e.getMessage());
-                messagesArray.remove(messagesArray.length() - 1);
             }
 
             @Override
@@ -277,7 +266,6 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 addResponse("Failed to load response due to " + e.getMessage());
-                messagesArray.remove(messagesArray.length() - 1);
             }
 
             @Override
