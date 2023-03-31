@@ -73,6 +73,8 @@ public class SignInActivity extends AppCompatActivity {
         btn_SignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                btn_SignIn.setEnabled(false);
+
                 if (currentUser == null) {
                     // 로그아웃 상태 & 탈퇴 상태
                     signIn();
@@ -89,6 +91,7 @@ public class SignInActivity extends AppCompatActivity {
                                     // 존재하지 않는 계정입니다.
                                     Toast.makeText(getApplicationContext(), "회원가입이 필요합니다.", Toast.LENGTH_SHORT).show();
                                     startSignUpActivity();
+                                    btn_SignIn.setEnabled(true);
                                 } else {
                                     // 존재하는 계정입니다.
                                     userRef.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -97,15 +100,18 @@ public class SignInActivity extends AppCompatActivity {
                                             if (dataSnapshot.exists()) {
                                                 // uid가 존재하는 경우
                                                 signIn();
+                                                btn_SignIn.setEnabled(true);
                                             } else {
                                                 // uid가 존재하지 않는 경우
                                                 Toast.makeText(getApplicationContext(), "회원가입이 필요합니다.", Toast.LENGTH_SHORT).show();
                                                 startSignUpActivity();
+                                                btn_SignIn.setEnabled(true);
                                             }
                                         }
                                         @Override
                                         public void onCancelled(DatabaseError databaseError) {
                                             // 쿼리가 취소된 경우
+                                            btn_SignIn.setEnabled(true);
                                         }
                                     });
                                 }

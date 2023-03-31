@@ -81,10 +81,10 @@
                 android:layout_centerInParent="true"
                 android:layout_toLeftOf="@id/send_btn"
                 android:background="@drawable/rounded_corner"
-                android:backgroundTint="#3A3D47"
+                android:backgroundTint="@color/main_lightGray"
                 android:layout_gravity="center"
                 android:hint="고민을 적어주세요"
-                android:textColorHint="#D9D9D9"
+                android:textColorHint="@color/text_lightGray"
                 android:textSize="16sp"
                 android:textColor="@color/white"
                 android:padding="16dp" />

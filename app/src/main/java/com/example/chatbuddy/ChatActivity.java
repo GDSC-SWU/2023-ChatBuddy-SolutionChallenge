@@ -17,8 +17,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.auth.User;
 
 import org.json.JSONArray;
@@ -77,6 +79,7 @@ public class ChatActivity extends AppCompatActivity {
         // Write a message to the database
         database = FirebaseDatabase.getInstance();
         userRef = database.getReference("users");
+        uidRef = userRef.child(currentUser.getUid());
 
         // chat
         recyclerView = findViewById(R.id.recycler_view);
@@ -84,6 +87,7 @@ public class ChatActivity extends AppCompatActivity {
         sendButton = findViewById(R.id.send_btn);
 
         btnBack = findViewById(R.id.btnBack);
+
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) { finish();
@@ -130,6 +134,28 @@ public class ChatActivity extends AppCompatActivity {
                     Log.d("firebase", String.valueOf(task.getResult().getValue()));
                     openai_api_key = String.valueOf(task.getResult().getValue());
                 }
+            }
+        });
+
+        uidRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // uid 노드의 모든 데이터를 가져옴
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String key = snapshot.getKey(); // 하위 노드의 키값을 가져옴
+                    Object value = snapshot.getValue(); // 하위 노드의 값을 가져옴
+                    // 이곳에서 하위 노드의 키와 값을 사용하여 원하는 작업을 수행할 수 있음
+                    switch (key) {
+                        case "nickName":
+                            userName = value.toString();
+                            break;
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // 데이터 로드에 실패한 경우 호출됨
+                Log.w("TAG", "loadPost:onCancelled", databaseError.toException());
             }
         });
     }
@@ -224,8 +250,7 @@ public class ChatActivity extends AppCompatActivity {
             messageObject.put("role", "system");
             messageObject.put("content", userName + " is talking with you. " +
                     userName + " is your best friend. And your name is Buddy. So introduce yourself as Buddy in first time. " +
-                    "Use friendly tone and speak informally." +
-                    "If user says something negative repeatedly, asks if user wants help.");
+                    "Use friendly tone and speak informally.");
             messagesArray.put(messageObject);
         }
 
