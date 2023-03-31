@@ -26,7 +26,7 @@ As a mental health supporter, CHATBuddy takes care of your mental health. When y
     
     
 ## Architecture
-정보구조도자리
+![정보구조도-01](https://user-images.githubusercontent.com/68415422/229152123-844c2c1f-1f41-4fda-856a-26a6716cf587.jpg)
 
 ## Techs
   * Cognitive function, emotional state measurement and emotional solution provision
