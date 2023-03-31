@@ -95,7 +95,7 @@ public class SolutionFragment extends Fragment {
         ArrayList<String> wordsList = new ArrayList<>();
 
 
-        layout.setVisibility(view.GONE);
+        layout.setVisibility(view.INVISIBLE);
         tvWelcome.setVisibility(view.INVISIBLE);
 
         chatRef.child("user").addListenerForSingleValueEvent(new ValueEventListener() {

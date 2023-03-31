@@ -70,10 +70,9 @@ public class PasswordActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String pre = intent.getExtras().getString("preAct");
 
-        if (pre.equals("SplashActivity")) {
+        if (pre.equals("SplashActivity") || pre.equals("SignInActivity")) {
             pswdTitle.setText("비밀번호 입력");
         }
-
 
         // 뒤로가기
         btnBack.setOnClickListener(new View.OnClickListener() {
@@ -232,7 +231,7 @@ public class PasswordActivity extends AppCompatActivity {
                     InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(pswd4.getWindowToken(), 0);
 
-                    if (pre.equals("SplashActivity")) {
+                    if (pre.equals("SplashActivity") || pre.equals("SignInActivity")) {
                         pswd = pswd1.getText().toString() + pswd2.getText().toString()
                                 + pswd3.getText().toString() + pswd4.getText().toString();
 

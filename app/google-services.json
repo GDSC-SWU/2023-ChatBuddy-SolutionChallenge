@@ -23,14 +23,6 @@
           }
         },
         {
-          "client_id": "312507382741-c53dgnh1ah2ebp42mg78l0ls897vhtbe.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.chatbuddy",
-            "certificate_hash": "b718b59a77262609cbecbfd1c98cca93b30caf7b"
-          }
-        },
-        {
           "client_id": "312507382741-pqrrlf2ge1en5fc3q1cqo5e3jsbab9nm.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

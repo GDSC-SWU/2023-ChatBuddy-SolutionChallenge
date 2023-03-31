@@ -19,7 +19,7 @@
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:background="@drawable/round_button"
-        android:backgroundTint="#00ABB4"
+        android:backgroundTint="@color/main_green"
         android:text="완료"
         android:textColor="@color/white"
         android:textSize="16sp"/>
