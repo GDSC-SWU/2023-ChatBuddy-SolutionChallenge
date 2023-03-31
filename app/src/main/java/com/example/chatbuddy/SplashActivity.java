@@ -1,8 +1,8 @@
 package com.example.chatbuddy;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -62,13 +62,11 @@ public class SplashActivity extends AppCompatActivity {
         // Write a message to the database
         database = FirebaseDatabase.getInstance();
         userRef = database.getReference("users");
+        if (currentUser != null) {
+            uidRef = userRef.child(currentUser.getUid());
+        }
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                autoSignIn();
-            }
-        }, 4000);
+        autoSignIn();
     }
 
     // 앱 시작 시 자동 로그인
@@ -143,7 +141,25 @@ public class SplashActivity extends AppCompatActivity {
 
                             if (firebaseUser != null) {
                                 Toast.makeText(getApplicationContext(), "로그인 성공", Toast.LENGTH_SHORT).show();
-                                startMainActivity();
+                                uidRef.child("password").child("on").addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        if (snapshot.exists()) {
+                                            Boolean on = snapshot.getValue(Boolean.class);
+                                            if (on.equals(true)) {
+                                                startPasswordActivity();
+                                            } else if (on.equals(false)) {
+                                                startMainActivity();
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+                                        // 데이터베이스 액세스 중 오류 발생 시 처리 방법
+
+                                    }
+                                });
                             }
 
                         } else {
@@ -180,4 +196,11 @@ public class SplashActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    private void startPasswordActivity() {
+        finishAffinity();
+        Intent intent = new Intent(getApplicationContext(), PasswordActivity.class);
+        intent.putExtra("preAct", "SplashActivity");
+        setResult(Activity.RESULT_OK, intent);
+        startActivity(intent);
+    }
 }
