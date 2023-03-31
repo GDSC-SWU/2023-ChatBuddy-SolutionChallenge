@@ -15,32 +15,24 @@
       },
       "oauth_client": [
         {
-          "client_id": "312507382741-9cghmatlbvi34eeipo4onvc4vp42g89h.apps.googleusercontent.com",
+          "client_id": "312507382741-4tbpfmr5aot9lp058lgbmba7augqiatt.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.chatbuddy",
-            "certificate_hash": "5889363098570a6291c08e8220771142c34e2b47"
-          }
-        },
-        {
-          "client_id": "312507382741-vtep7tg4el7e4o48om822jcpqr1olck3.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.chatbuddy",
-            "certificate_hash": "802f530235390ebc52a97604cdbce0f3d6f5fb16"
+            "certificate_hash": "ab67abc5661b7739364d08fc61712e21848d7b0d"
           }
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyC1jYkTwpnW40kBYGejLX-RdJSd3wLOkW4"
+          "current_key": "AIzaSyBXQfBBBWVQzJpIpTX89YwK3vYnd-huEn4"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "312507382741-o0h12p9th86ep8ga12325nit1ecs14q9.apps.googleusercontent.com",
+              "client_id": "312507382741-9ee53jjte1epf5kbur7g60kh2bqbh5rm.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

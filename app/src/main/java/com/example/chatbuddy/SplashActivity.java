@@ -76,25 +76,40 @@ public class SplashActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "로그인이 필요합니다.", Toast.LENGTH_SHORT).show();
             startSignInActivity();
         } else {
-            String uid = mAuth.getCurrentUser().getUid();
-            userRef.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.exists()) {
-                        // uid가 존재하는 경우
-                        signIn();
-                    } else {
-                        // uid가 존재하지 않는 경우
-                        Toast.makeText(getApplicationContext(), "회원가입이 필요합니다.", Toast.LENGTH_SHORT).show();
-                        startSignUpActivity();
-                    }
-                }
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    // 쿼리가 취소된 경우
-                    Toast.makeText(getApplicationContext(), "오류 발생", Toast.LENGTH_SHORT).show();
-                }
-            });
+            // 유효한 계정입니다.
+            // Firebase에서 해당 계정이 존재하는지 확인합니다.
+            String email = currentUser.getEmail();
+            mAuth.fetchSignInMethodsForEmail(email)
+                    .addOnCompleteListener(task -> {
+                        boolean isNewUser = task.getResult().getSignInMethods().isEmpty();
+                        if (isNewUser) {
+                            // authentication에 존재하지 않는 계정입니다.
+                            Toast.makeText(getApplicationContext(), "회원가입이 필요합니다.", Toast.LENGTH_SHORT).show();
+                            startSignUpActivity();
+                        } else {
+                            // authenticaiton에 존재하는 계정입니다.
+                            // realtime database로 더블체크
+                            String uid = currentUser.getUid();
+                            userRef.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    if (dataSnapshot.exists()) {
+                                        // uid가 존재하는 경우
+                                        signIn();
+                                    } else {
+                                        // uid가 존재하지 않는 경우
+                                        Toast.makeText(getApplicationContext(), "회원가입이 필요합니다.", Toast.LENGTH_SHORT).show();
+                                        startSignUpActivity();
+                                    }
+                                }
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+                                    // 쿼리가 취소된 경우
+                                    Toast.makeText(getApplicationContext(), "오류 발생", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    });
         }
     }
 
@@ -110,14 +125,14 @@ public class SplashActivity extends AppCompatActivity {
 
         // 구글 로그인 시
         if (requestCode == RC_SIGN_IN) {
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
+                Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
                 // 로그인 성공 시
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
                 // 로그인 실패 시
-                Log.w("TAG", "Google sign in failed", e);
+                Log.w("TAG", "signInResult:failed code=" + e.getStatusCode());
                 Toast.makeText(getApplicationContext(), "로그인에 실패했습니다.", Toast.LENGTH_SHORT).show();
                 startSignInActivity();
             }
@@ -138,28 +153,49 @@ public class SplashActivity extends AppCompatActivity {
                             // 로그인 성공 시
                             Log.d("TAG", "signInWithCredential:success");
                             FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                            String uid = firebaseUser.getUid();
+                            uidRef = userRef.child(firebaseUser.getUid());
 
-                            if (firebaseUser != null) {
-                                Toast.makeText(getApplicationContext(), "로그인 성공", Toast.LENGTH_SHORT).show();
-                                uidRef.child("password").child("on").addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        if (snapshot.exists()) {
-                                            Boolean on = snapshot.getValue(Boolean.class);
-                                            if (on.equals(true)) {
-                                                startPasswordActivity();
-                                            } else if (on.equals(false)) {
-                                                startMainActivity();
-                                            }
+                            userRef.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    if (dataSnapshot.exists()) {
+                                        // uid가 존재하는 경우
+                                        if (firebaseUser != null) {
+                                            uidRef.child("password").child("on").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                    if (snapshot.exists()) {
+                                                        Boolean on = snapshot.getValue(Boolean.class);
+                                                        if (on.equals(true)) {
+                                                            startPasswordActivity();
+                                                        } else if (on.equals(false)) {
+                                                            startMainActivity();
+                                                            Toast.makeText(getApplicationContext(), "로그인 성공", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }
+                                                }
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError error) {
+                                                    // 데이터베이스 액세스 중 오류 발생 시 처리 방법
+
+                                                }
+                                            });
                                         }
+                                    } else {
+                                        // uid가 존재하지 않는 경우
+                                        Toast.makeText(getApplicationContext(), "회원가입이 필요합니다.", Toast.LENGTH_SHORT).show();
+                                        startSignUpActivity();
                                     }
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError error) {
-                                        // 데이터베이스 액세스 중 오류 발생 시 처리 방법
+                                }
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+                                    // 쿼리가 취소된 경우
+                                    Toast.makeText(getApplicationContext(), "오류 발생", Toast.LENGTH_SHORT).show();
+                                }
+                            });
 
-                                    }
-                                });
-                            }
+
 
                         } else {
                             // 로그인 실패 시

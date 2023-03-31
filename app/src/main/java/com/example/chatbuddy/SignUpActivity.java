@@ -37,7 +37,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.auth.User;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -59,7 +58,6 @@ public class SignUpActivity extends AppCompatActivity {
     // realtime database
     FirebaseDatabase database;
     DatabaseReference userRef;
-    User user;
 
 
     @Override
@@ -77,7 +75,7 @@ public class SignUpActivity extends AppCompatActivity {
         btnSignUp = findViewById(R.id.btnSignUp);
 
         // Firebase 앱 초기화
-        FirebaseApp.initializeApp(SignUpActivity.this);
+        FirebaseApp.initializeApp(getApplicationContext());
         // Firebase 인증 객체 초기화
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
@@ -145,6 +143,7 @@ public class SignUpActivity extends AppCompatActivity {
                 // 로그인 실패 시
                 Log.w("TAG", "Google sign in failed", e);
                 Toast.makeText(getApplicationContext(), "로그인에 실패했습니다.", Toast.LENGTH_SHORT).show();
+                startSignInActivity();
             }
         }
     }
@@ -172,7 +171,7 @@ public class SignUpActivity extends AppCompatActivity {
                             // 로그인 실패 시
                             Log.w("TAG", "signInWithCredential:failure", task.getException());
                             Toast.makeText(getApplicationContext(), "로그인 실패", Toast.LENGTH_SHORT).show();
-
+                            startSignInActivity();
                         }
                     }
                 });

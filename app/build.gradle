@@ -5,6 +5,14 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('C:\\Users\\User\\Desktop\\Github\\2023-ChatBuddy-SolutionChallenge\\chatbuddy.jks')
+            storePassword 'gdsc2023'
+            keyAlias 'chatbuddy'
+            keyPassword 'gdsc2023'
+        }
+    }
     namespace 'com.example.chatbuddy'
     compileSdk 33
 
@@ -22,6 +30,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {
@@ -34,7 +43,7 @@ apply plugin: 'com.google.gms.google-services'
 
 dependencies {
     // Import the Firebase BoM
-    implementation platform('com.google.firebase:firebase-bom:31.3.0')
+    implementation platform('com.google.firebase:firebase-bom:31.4.0')
     // TODO: Add the dependencies for Firebase products you want to use
     // When using the BoM, don't specify versions in Firebase dependencies
     implementation 'com.google.firebase:firebase-analytics-ktx'
@@ -51,12 +60,12 @@ dependencies {
     implementation 'com.google.firebase:firebase-database'
 
     // glide 라이브러리 추가
-    implementation 'com.github.bumptech.glide:glide:4.12.0'
+    implementation 'com.github.bumptech.glide:glide:4.15.1'
     implementation 'com.google.firebase:firebase-database-ktx:20.1.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.15.1'
 
     // for openai
-    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+    implementation('com.squareup.okhttp3:okhttp:5.0.0-alpha.11')
 
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.8.0'
@@ -68,7 +77,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
     // nlp
-    implementation group: 'org.apache.opennlp', name: 'opennlp-tools', version: '1.9.3'
+    implementation group: 'org.apache.opennlp', name: 'opennlp-tools', version: '2.1.1'
     implementation files('libs/kkma-2.1.jar')
 
     implementation 'com.google.android.material:material:1.8.0'
