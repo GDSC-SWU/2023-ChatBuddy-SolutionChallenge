@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="30dp"
-    tools:context=".MindMapActivity">
+    tools:context=".MindMapActivity"
+    android:id="@+id/MindMapActivity">
 
     <ImageButton
         android:id="@+id/btnBack"
@@ -36,8 +37,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".MindMapActivity"
-        android:id="@+id/MindMapActivity" >
+        android:id="@+id/MindMapLayout" >
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/task1"
@@ -176,20 +176,20 @@
             tools:ignore="MissingConstraints" />
 
         <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/task9"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:layout_marginRight="0dp"
-        android:layout_marginBottom="50dp"
+            android:id="@+id/task9"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginRight="0dp"
+            android:layout_marginBottom="50dp"
 
-        android:background="@drawable/circle"
-        android:backgroundTint="@color/main_lightGray"
-        android:text="취업"
-        android:textSize="30sp"
+            android:background="@drawable/circle"
+            android:backgroundTint="@color/main_lightGray"
+            android:text="취업"
+            android:textSize="30sp"
 
-        app:layout_constraintBottom_toTopOf="@+id/task4"
-        app:layout_constraintRight_toRightOf="parent"
-        tools:ignore="MissingConstraints" />
+            app:layout_constraintBottom_toTopOf="@+id/task4"
+            app:layout_constraintRight_toRightOf="parent"
+            tools:ignore="MissingConstraints" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/task10"

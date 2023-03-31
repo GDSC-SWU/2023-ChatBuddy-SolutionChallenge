@@ -118,18 +118,18 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 btnFirst = findViewById(R.id.first);
-                btnFirst.setOnClickListener(fistview ->{
+                btnFirst.setOnClickListener(firstview ->{
                     Toast.makeText(getApplicationContext(), "Selected First", Toast.LENGTH_LONG).show();
                 });
 
                 btnSetting = findViewById(R.id.second);
-                btnSetting.setOnClickListener(fistview ->{
+                btnSetting.setOnClickListener(firstview ->{
                     Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
                     startActivity(intent);
                 });
 
                 btnThird = findViewById(R.id.third);
-                btnThird.setOnClickListener(fistview ->{
+                btnThird.setOnClickListener(firstview ->{
                     Toast.makeText(getApplicationContext(), "Selected Third", Toast.LENGTH_LONG).show();
                 });
             } else {

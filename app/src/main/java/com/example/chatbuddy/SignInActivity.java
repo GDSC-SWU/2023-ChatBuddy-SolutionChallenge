@@ -34,7 +34,7 @@ import com.google.firebase.firestore.auth.User;
 public class SignInActivity extends AppCompatActivity {
 
     LinearLayout btn_SignIn;
-    Button btnHelp;
+    Button btnHelp, btnX;
 
     // firebase authentication
     private static final int RC_SIGN_IN = 123;

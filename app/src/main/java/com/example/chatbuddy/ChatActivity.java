@@ -5,7 +5,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -52,7 +51,6 @@ public class ChatActivity extends AppCompatActivity {
 
     // chat
     RecyclerView recyclerView;
-    TextView welcomeTextView;
     EditText messageEditText;
     ImageButton sendButton, btnBack;
     List<Message> messageList;
@@ -82,14 +80,14 @@ public class ChatActivity extends AppCompatActivity {
 
         // chat
         recyclerView = findViewById(R.id.recycler_view);
-        welcomeTextView = findViewById(R.id.welcome_text);
         messageEditText = findViewById(R.id.message_edit_text);
         sendButton = findViewById(R.id.send_btn);
 
         btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) { finish(); }
+            public void onClick(View view) { finish();
+            }
         });
 
         messageList = new ArrayList<>();

@@ -11,8 +11,10 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.firebase.auth.FirebaseAuth;
@@ -41,7 +43,6 @@ import java.util.List;
 import java.util.Map;
 
 public class MindMapActivity extends AppCompatActivity {
-    ImageButton btnBack;
 
     // firebase authentication
     GoogleSignInClient mGoogleSignInClient;
@@ -53,7 +54,11 @@ public class MindMapActivity extends AppCompatActivity {
     DatabaseReference userRef, uidRef, chatRef;
     User user;
 
+    ImageButton btnBack;
+
     static ImageView CloudView;
+    static TextView tvWelcome;
+    static ConstraintLayout lmindMap;
 
     static ViewGroup layout;
     StringBuilder builder;
@@ -67,12 +72,6 @@ public class MindMapActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mind_map);
 
-        // 버튼
-        btnBack = findViewById(R.id.btnBack);
-        layout = findViewById(R.id.MindMapActivity);
-
-        //CloudView = findViewById(R.id.cloudView);
-
         // Firebase 인증 객체 초기화
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
@@ -82,7 +81,17 @@ public class MindMapActivity extends AppCompatActivity {
         userRef = database.getReference("users");
         uidRef = userRef.child(currentUser.getUid());
         chatRef = uidRef.child("chat");
+
+        tvWelcome = findViewById(R.id.welcome_text);
+
+        btnBack = findViewById(R.id.btnBack);
+        layout = findViewById(R.id.MindMapLayout);
+
+        //CloudView = findViewById(R.id.cloudView);
+
+
         builder = new StringBuilder();
+        ArrayList<String> wordsList = new ArrayList<>();
 
         // 뒤로가기
         btnBack.setOnClickListener(new View.OnClickListener() {
@@ -92,7 +101,6 @@ public class MindMapActivity extends AppCompatActivity {
             }
         });
 
-        ArrayList<String> wordsList = new ArrayList<>();
         chatRef.child("user").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -110,7 +118,6 @@ public class MindMapActivity extends AppCompatActivity {
                     System.out.println("wordsList: " + wordsList);
                 }
 
-                //String[] words = builder.toString().split(" ");
                 freq = new HashMap<>();
                 // 배열을 반복하면서 각 원소의 등장 횟수를 계산합니다.
                 for (String element : wordsList) {
@@ -129,6 +136,8 @@ public class MindMapActivity extends AppCompatActivity {
                 System.out.println("sortedMap: " + sortedMap);
 
                 changeText(sortedMap);
+
+
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -148,6 +157,12 @@ public class MindMapActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setContentView(R.layout.activity_mind_map);
     }
 
     public static void changeText(Map<String, Integer> sortedMap) {
