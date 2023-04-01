@@ -60,12 +60,14 @@ public class ChatActivity extends AppCompatActivity {
     String openai_api_key;
     public final MediaType JSON
             = MediaType.get("application/json; charset=utf-8");
-    OkHttpClient client = new OkHttpClient();
+    OkHttpClient client;
     String userName;
     JSONArray messagesArray;
     JSONObject messageObject;
-    final int MAX_MESSAGE_COUNT = 1000; // 최대 메시지 수
     int selfHarm;
+    String res_embedding;
+    int failed;
+    int i;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,30 +83,33 @@ public class ChatActivity extends AppCompatActivity {
         userRef = database.getReference("users");
         uidRef = userRef.child(currentUser.getUid());
 
-        // chat
-        recyclerView = findViewById(R.id.recycler_view);
-        messageEditText = findViewById(R.id.message_edit_text);
-        sendButton = findViewById(R.id.send_btn);
 
         btnBack = findViewById(R.id.btnBack);
-
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) { finish();
             }
         });
 
+
+        client = new OkHttpClient();
         messageList = new ArrayList<>();
         messagesArray = new JSONArray();
         selfHarm = 0;
 
+        // chat
+        recyclerView = findViewById(R.id.recycler_view);
+        messageEditText = findViewById(R.id.message_edit_text);
+        sendButton = findViewById(R.id.send_btn);
         // setup recycler view
         messageAdapter = new MessageAdapter(messageList);
+
         recyclerView.setAdapter(messageAdapter);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         llm.setStackFromEnd(true);
         recyclerView.setLayoutManager(llm);
 
+        failed = 0;
         sendButton.setOnClickListener((v)->{
             String question = messageEditText.getText().toString().trim();
 
@@ -116,6 +121,7 @@ public class ChatActivity extends AppCompatActivity {
                 blockEdit(false);
                 try {
                     callChatAPI(question);
+                    //embeddings();
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
@@ -185,16 +191,11 @@ public class ChatActivity extends AppCompatActivity {
         addToChat(response, Message.SENT_BY_BOT);
     }
 
-    /*
     void embeddings() {
-        String jsonString = messagesArray.toString();
-        int jsonLength = jsonString.length();
-        System.out.println(jsonLength);
-
         JSONObject jsonBody = new JSONObject();
         try {
-            jsonBody.put("input", "text-embedding-ada-002");
-            jsonBody.put("input", messagesArray);
+            jsonBody.put("model", "text-embedding-ada-002");
+            jsonBody.put("input", messagesArray.toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -208,7 +209,7 @@ public class ChatActivity extends AppCompatActivity {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                addResponse("Failed to load response due to " + e.getMessage());
+                System.out.println("Failed to load response due to " + e.getMessage());
             }
 
             @Override
@@ -217,40 +218,29 @@ public class ChatActivity extends AppCompatActivity {
                     JSONObject jsonObject = null;
                     try {
                         jsonObject = new JSONObject(response.body().string());
-                        JSONArray jsonArray = jsonObject.getJSONArray("choices");
-                        String result = jsonArray.getJSONObject(0).getJSONObject("message").getString("content");
-                        addResponse(result.trim());
+                        JSONArray jsonArray = jsonObject.getJSONArray("data");
+                        res_embedding = jsonArray.getJSONObject(0).getString("embedding");
 
-                        JSONObject resMessageObject = new JSONObject();
-                        resMessageObject.put("role", "assistant");
-                        resMessageObject.put("content", result.trim());
-                        userRef.child(currentUser.getUid()).child("chat").child("assistant").child(String.valueOf(System.currentTimeMillis())).setValue(result.trim());
-                        messagesArray.put(resMessageObject);
-
-                        String finish = jsonArray.getJSONObject(0).getString("finish_reason");
-                        System.out.println("finish: " + finish.trim());
-
-
-                        System.out.println("usage: " + jsonObject.getJSONObject("usage"));
+                        System.out.println("embeddings: " + res_embedding);
+                        //callChatAPI(res_embedding);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 } else {
-                    addResponse("Failed to load response due to " + response.body().string());
-                    messagesArray.remove(messagesArray.length() - 1);
+                    System.out.println("Failed to load response due to " + response.body().string());
+                    //messagesArray.remove(messagesArray.length() - 1);
                 }
             }
         });
     }
-     */
 
     void callChatAPI(String question) throws JSONException {
         if (messagesArray.length() == 0) {
             messageObject = new JSONObject();
             messageObject.put("role", "system");
-            messageObject.put("content", userName + " is talking with you. " +
-                    userName + " is your best friend. And your name is Buddy. So introduce yourself as Buddy in first time. " +
-                    "Use friendly tone and speak informally.");
+            messageObject.put("content", "You are a chatbot named Chuddy. " +
+                    "Chuddy is a best friend with " + userName + " who is talking with you. " +
+                    "Chuddy is friendly and speak informally. And only answer based on facts.");
             messagesArray.put(messageObject);
         }
 
@@ -260,19 +250,15 @@ public class ChatActivity extends AppCompatActivity {
         messageObject = new JSONObject();
         messageObject.put("role", "user");
         messageObject.put("content", question);
-
-        userRef.child(currentUser.getUid()).child("chat").child("user").child(String.valueOf(System.currentTimeMillis())).setValue(question);
         messagesArray.put(messageObject);
 
-        String jsonString = messagesArray.toString();
-        int jsonLength = jsonString.length();
-        System.out.println(jsonLength + ": " + jsonString);
+        userRef.child(currentUser.getUid()).child("chat").child("user").child(String.valueOf(System.currentTimeMillis())).setValue(question);
 
         JSONObject jsonBody = new JSONObject();
         try {
             jsonBody.put("model", "gpt-3.5-turbo");
             jsonBody.put("messages", messagesArray);
-            jsonBody.put("max_tokens", 200);
+            jsonBody.put("max_tokens", 1500);
             jsonBody.put("temperature", 0.8);
             jsonBody.put("frequency_penalty", 1);
             jsonBody.put("presence_penalty", 1);
@@ -290,13 +276,27 @@ public class ChatActivity extends AppCompatActivity {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                addResponse("Failed to load response due to " + e.getMessage());
+                failed++;
+
+                System.out.println("(1) Failed to load response due to " + e.getMessage());
+                messageList.remove(messageList.size() - 1);
+                messagesArray.remove(messagesArray.length() - 1);
+
+                if (failed > 3 && messagesArray.length() > 4) {
+                    messagesArray.remove(1);
+                }
+                try {
+                    callChatAPI(question);
+                } catch (JSONException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                JSONObject jsonObject = null;
+
                 if (response.isSuccessful()) {
-                    JSONObject jsonObject = null;
                     try {
                         jsonObject = new JSONObject(response.body().string());
                         JSONArray jsonArray = jsonObject.getJSONArray("choices");
@@ -309,30 +309,35 @@ public class ChatActivity extends AppCompatActivity {
                         userRef.child(currentUser.getUid()).child("chat").child("assistant").child(String.valueOf(System.currentTimeMillis())).setValue(result.trim());
                         messagesArray.put(resMessageObject);
 
-                        String finish = jsonArray.getJSONObject(0).getString("finish_reason");
-                        System.out.println("finish: " + finish.trim());
+                        String jsonString = messagesArray.toString();
+                        int jsonLength = jsonString.length();
+                        System.out.println(jsonLength + ": " + jsonString);
 
-                        System.out.println("total usage: " + Integer.parseInt(jsonObject.getJSONObject("usage").getString("total_tokens")));
-
-                        if (Integer.parseInt(jsonObject.getJSONObject("usage").getString("total_tokens")) > 300) {
-                            String jsonString = messagesArray.toString();
-                            int jsonLength = jsonString.length();
-
-                            while (jsonLength > 500) {
-                                messagesArray.remove(1);
-                            }
-                        }
-
+                        failed = 0;
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 } else {
-                    addResponse("Failed to load response due to " + response.body().string());
-                    messagesArray.remove(messagesArray.length() - 1);
+                    System.out.println("(2) Failed to load response due to " + response.body().string());
                 }
             }
         });
     }
+
+    public int checkIfKeyExists() {
+        try {
+            for (int i = 0; i < messagesArray.length(); i++) {
+                JSONObject jsonObject = messagesArray.getJSONObject(i);
+                if (jsonObject.has("system")) {
+                    return i;
+                }
+            }
+            return -1;
+        } catch (JSONException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
 
     void callModAPI(String question) throws JSONException {
 

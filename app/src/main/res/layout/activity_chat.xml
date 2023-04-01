@@ -65,7 +65,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/recycler_view"
-            android:layout_above="@id/bottom_layout" />
+            android:layout_above="@id/bottom_layout"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp" />
 
         <FrameLayout
             android:id="@+id/bottom_layout"
@@ -96,6 +98,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerInParent="true"
                 android:layout_gravity="right|center_vertical"
+                android:layout_marginLeft="35dp"
                 android:layout_marginRight="35dp"
                 android:src="@drawable/btn_send"
                 android:background="@android:color/transparent"/>
