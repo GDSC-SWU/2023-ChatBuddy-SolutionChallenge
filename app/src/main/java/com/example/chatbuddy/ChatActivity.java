@@ -285,6 +285,7 @@ public class ChatActivity extends AppCompatActivity {
                 if (failed > 3 && messagesArray.length() > 4) {
                     messagesArray.remove(1);
                 }
+
                 try {
                     callChatAPI(question);
                 } catch (JSONException ex) {
