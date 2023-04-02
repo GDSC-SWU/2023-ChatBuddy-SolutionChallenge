@@ -219,18 +219,18 @@ public class SolutionFragment extends Fragment {
                 }
                 // 그 외의 경우
                 else {
+
                     if (scrollY > oldScrollY) { // 스크롤을 내릴 때
+                        ll_Todo.setVisibility(View.VISIBLE);
                         cl_MindMap.animate().alpha(0f).setDuration(500).start(); // layout1 서서히 안보이게 하기
                         ll_Todo.animate().alpha(1f).setDuration(500).start(); // layout2 서서히 나타내기
                     } else if (scrollY < oldScrollY) { // 스크롤을 올릴 때
+                        cl_MindMap.setVisibility(View.VISIBLE);
                         ll_Todo.animate().alpha(0f).setDuration(500).start(); // layout2 서서히 안보이게 하기
                         cl_MindMap.animate().alpha(1f).setDuration(500).start(); // layout1 서서히 나타내기
                     }
 
                 }
-
-
-
 
             }
         });

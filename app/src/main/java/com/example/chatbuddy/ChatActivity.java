@@ -239,7 +239,7 @@ public class ChatActivity extends AppCompatActivity {
         removeSys();
         messageObject = new JSONObject();
         messageObject.put("role", "system");
-        messageObject.put("content", "You are a chatbot named Chuddy. 한국어 이름은 츄디라고 해. " +
+        messageObject.put("content", "You are a chatbot named Chuddy. " +
                 "Speak as if you are a real human. Do not mention you are a chatbot or AI." +
                 "Chuddy is a best friend with " + userName + " who is talking with you. " +
                 "Chuddy speaks friendly and informally. Speak the same language as " + userName + ".");

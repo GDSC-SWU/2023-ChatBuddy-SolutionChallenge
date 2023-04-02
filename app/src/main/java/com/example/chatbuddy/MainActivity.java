@@ -1,5 +1,6 @@
 package com.example.chatbuddy;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     SolutionFragment frag2;
     FragmentTransaction transaction;
     int frag_no;
+    LinearLayout drawerOut;
 
     private ImageButton btnNext;
     // 드로어
@@ -56,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     DatabaseReference userRef, uidRef;
 
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,9 +79,29 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout ll = (LinearLayout)inflater.inflate(R.layout.drawer, null);
 
         AtomicInteger state = new AtomicInteger(); // 메뉴 상태 - 0이면 닫힌 상태, 1이면 열린 상태
-
         final Animation animOpen = AnimationUtils.loadAnimation(this, R.anim.anim_translate_left);
         final Animation animClose = AnimationUtils.loadAnimation(this, R.anim.anim_translate_right);
+
+        btnNext = findViewById(R.id.btnNext);
+
+        fragmentManager = getSupportFragmentManager();
+        frag1 = new ChatFragment();
+        frag2 = new SolutionFragment();
+        transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.fragment_container, frag1).commitAllowingStateLoss();
+        frag_no = 1;
+
+
+        mainActivity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (state.get() == 1) {
+                    ll.startAnimation(animClose);
+                    ((ViewManager) ll.getParent()).removeView(ll);
+                    state.set(0);
+                }
+            }
+        });
 
         btnMenu.setOnClickListener(view -> {
             if(state.get() == 0) {
@@ -132,21 +155,13 @@ public class MainActivity extends AppCompatActivity {
                 btnThird.setOnClickListener(firstview ->{
                     Toast.makeText(getApplicationContext(), "Selected Third", Toast.LENGTH_LONG).show();
                 });
+
             } else {
                 ll.startAnimation(animClose);
                 ((ViewManager)ll.getParent()).removeView(ll);
                 state.set(0);
             }
         });
-
-        btnNext = findViewById(R.id.btnNext);
-
-        fragmentManager = getSupportFragmentManager();
-        frag1 = new ChatFragment();
-        frag2 = new SolutionFragment();
-        transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.fragment_container, frag1).commitAllowingStateLoss();
-        frag_no = 1;
 
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -163,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
 
     private void callFragment(int i){
         transaction = fragmentManager.beginTransaction();
