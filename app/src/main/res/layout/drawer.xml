@@ -13,7 +13,7 @@
         android:layout_width="267dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="#292C33"
+        android:background="@color/main_darkGray"
         android:elevation="20dp">
 
         <LinearLayout
