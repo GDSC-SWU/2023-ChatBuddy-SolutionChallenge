@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -26,18 +27,19 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.auth.User;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    private final int frag1 = 1;
-    private final int frag2 = 2;
+    FragmentManager fragmentManager;
+    ChatFragment frag1;
+    SolutionFragment frag2;
+    FragmentTransaction transaction;
+    int frag_no;
 
     private ImageButton btnNext;
-
     // 드로어
     ImageButton btnMenu;
     TextView tvDrawerName;
@@ -52,8 +54,6 @@ public class MainActivity extends AppCompatActivity {
     // realtime database
     FirebaseDatabase database;
     DatabaseReference userRef, uidRef;
-    User user;
-
 
 
     @Override
@@ -140,46 +140,40 @@ public class MainActivity extends AppCompatActivity {
         });
 
         btnNext = findViewById(R.id.btnNext);
-        final int[] fState = {1};
+
+        fragmentManager = getSupportFragmentManager();
+        frag1 = new ChatFragment();
+        frag2 = new SolutionFragment();
+        transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.fragment_container, frag1).commitAllowingStateLoss();
+        frag_no = 1;
 
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(fState[0] ==1){
+                if(frag_no ==1){
                     callFragment(2);
-                    fState[0] = 2;
+                    frag_no = 2;
                     btnNext.setImageResource(R.drawable.btn_solution);
-                } else if (fState[0] ==2) {
+                } else if (frag_no == 2) {
                     callFragment(1);
-                    fState[0] = 1;
+                    frag_no = 1;
                     btnNext.setImageResource(R.drawable.btn_chat);
                 }
             }
         });
-
-        callFragment(frag1);
     }
 
-    private void callFragment(int frament_no){
+    private void callFragment(int i){
+        transaction = fragmentManager.beginTransaction();
 
-        // 프래그먼트 사용을 위해
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-        switch (frament_no){
+        switch (i) {
             case 1:
-                // '프래그먼트1' 호출
-                ChatFragment fragment1 = new ChatFragment();
-                transaction.replace(R.id.fragment_container, fragment1);
-                transaction.commit();
+                transaction.replace(R.id.fragment_container, frag1).commitAllowingStateLoss();
                 break;
-
             case 2:
-                // '프래그먼트2' 호출
-                SolutionFragment fragment2 = new SolutionFragment();
-                transaction.replace(R.id.fragment_container, fragment2);
-                transaction.commit();
+                transaction.replace(R.id.fragment_container, frag2).commitAllowingStateLoss();
                 break;
         }
-
     }
 }

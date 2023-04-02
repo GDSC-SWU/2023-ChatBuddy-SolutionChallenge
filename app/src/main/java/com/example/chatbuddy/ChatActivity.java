@@ -64,10 +64,8 @@ public class ChatActivity extends AppCompatActivity {
     String userName;
     JSONArray messagesArray;
     JSONObject messageObject;
-    int selfHarm;
+    int failed, selfHarm;
     String res_embedding;
-    int failed;
-    int i;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +119,7 @@ public class ChatActivity extends AppCompatActivity {
                 blockEdit(false);
                 try {
                     callChatAPI(question);
+                    callModAPI(question);
                     //embeddings();
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
@@ -166,6 +165,7 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
+    // 사용자 입력 제어
     void blockEdit(boolean bool) {
         messageEditText.setEnabled(bool);
         messageEditText.setFocusable(bool);
@@ -235,37 +235,40 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     void callChatAPI(String question) throws JSONException {
-        if (messagesArray.length() == 0) {
-            messageObject = new JSONObject();
-            messageObject.put("role", "system");
-            messageObject.put("content", "You are a chatbot named Chuddy. " +
-                    "Chuddy is a best friend with " + userName + " who is talking with you. " +
-                    "Chuddy is friendly and speak informally. And only answer based on facts.");
-            messagesArray.put(messageObject);
-        }
+        // 시스템 메세지
+        removeSys();
+        messageObject = new JSONObject();
+        messageObject.put("role", "system");
+        messageObject.put("content", "You are a chatbot named Chuddy. 한국어 이름은 츄디라고 해. " +
+                "Speak as if you are a real human. Do not mention you are a chatbot or AI." +
+                "Chuddy is a best friend with " + userName + " who is talking with you. " +
+                "Chuddy speaks friendly and informally. Speak the same language as " + userName + ".");
+        messagesArray.put(messageObject);
 
         //okhttp
         messageList.add(new Message("입력 중... ", Message.SENT_BY_BOT));
 
+        // 유저 메세지
         messageObject = new JSONObject();
         messageObject.put("role", "user");
         messageObject.put("content", question);
         messagesArray.put(messageObject);
 
+        // db에 대화 내용 저장
         userRef.child(currentUser.getUid()).child("chat").child("user").child(String.valueOf(System.currentTimeMillis())).setValue(question);
 
+        // reqest 메세지
         JSONObject jsonBody = new JSONObject();
         try {
             jsonBody.put("model", "gpt-3.5-turbo");
             jsonBody.put("messages", messagesArray);
-            jsonBody.put("max_tokens", 1500);
+            jsonBody.put("max_tokens", 3500);
             jsonBody.put("temperature", 0.8);
             jsonBody.put("frequency_penalty", 1);
             jsonBody.put("presence_penalty", 1);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
         RequestBody body = RequestBody.create(jsonBody.toString(), JSON);
         Request request = new Request.Builder()
                 .url("https://api.openai.com/v1/chat/completions")
@@ -273,20 +276,25 @@ public class ChatActivity extends AppCompatActivity {
                 .post(body)
                 .build();
 
+        // request 요청
         client.newCall(request).enqueue(new Callback() {
+            // timeout 등 오류
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 failed++;
 
                 System.out.println("(1) Failed to load response due to " + e.getMessage());
+                // 이전 question 제거
                 messageList.remove(messageList.size() - 1);
                 messagesArray.remove(messagesArray.length() - 1);
 
+                // 여러번 실패하면 이전 내용 제거
                 if (failed > 3 && messagesArray.length() > 4) {
-                    messagesArray.remove(1);
+                    messagesArray.remove(0);
                 }
 
                 try {
+                    // question 재전송
                     callChatAPI(question);
                 } catch (JSONException ex) {
                     throw new RuntimeException(ex);
@@ -310,35 +318,49 @@ public class ChatActivity extends AppCompatActivity {
                         userRef.child(currentUser.getUid()).child("chat").child("assistant").child(String.valueOf(System.currentTimeMillis())).setValue(result.trim());
                         messagesArray.put(resMessageObject);
 
+                        // 결과 확인
                         String jsonString = messagesArray.toString();
                         int jsonLength = jsonString.length();
                         System.out.println(jsonLength + ": " + jsonString);
 
-                        failed = 0;
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 } else {
+                    failed++;
+
                     System.out.println("(2) Failed to load response due to " + response.body().string());
+                    // 이전 메세지 제거
+                    messageList.remove(messageList.size() - 1);
+                    messagesArray.remove(messagesArray.length() - 1);
+
+                    if (failed > 3 && messagesArray.length() > 4) {
+                        messagesArray.remove(1);
+                    }
+
+                    try {
+                        callChatAPI(question);
+                    } catch (JSONException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
             }
         });
     }
 
-    public int checkIfKeyExists() {
+    public void removeSys() {
         try {
             for (int i = 0; i < messagesArray.length(); i++) {
                 JSONObject jsonObject = messagesArray.getJSONObject(i);
-                if (jsonObject.has("system")) {
-                    return i;
+
+                if (jsonObject.getString("role") == "system") {
+                    messagesArray.remove(i);
                 }
             }
-            return -1;
         } catch (JSONException ex) {
             throw new RuntimeException(ex);
         }
     }
-
 
     void callModAPI(String question) throws JSONException {
 

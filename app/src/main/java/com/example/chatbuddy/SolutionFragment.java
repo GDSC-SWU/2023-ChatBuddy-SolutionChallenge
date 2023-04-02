@@ -1,6 +1,5 @@
 package com.example.chatbuddy;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -14,8 +13,12 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -65,17 +68,18 @@ public class SolutionFragment extends Fragment {
     List<Map.Entry<String, Integer>> entryList;
     int cnt;
 
-    LinearLayout todo1;
+    ScrollView sv_Solution;
+    ConstraintLayout cl_MindMap;
+    LinearLayout ll_Todo, todo1;
 
     public SolutionFragment() {
         // Required empty public constructor
     }
 
-    @SuppressLint("MissingInflatedId")
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_solution,container,false);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_solution, container,false);
 
         // Firebase 인증 객체 초기화
         mAuth = FirebaseAuth.getInstance();
@@ -89,14 +93,13 @@ public class SolutionFragment extends Fragment {
 
         tvWelcome = view.findViewById(R.id.welcome_text);
         layout = view.findViewById(R.id.MindMapLayout);
-
         //CloudView = findViewById(R.id.cloudView);
         builder = new StringBuilder();
         ArrayList<String> wordsList = new ArrayList<>();
 
-
         layout.setVisibility(view.INVISIBLE);
         tvWelcome.setVisibility(view.INVISIBLE);
+
 
         chatRef.child("user").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -184,6 +187,53 @@ public class SolutionFragment extends Fragment {
         });
 
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        sv_Solution = view.findViewById(R.id.scrollSolution);
+        cl_MindMap = view.findViewById(R.id.MindMapLayout);
+        ll_Todo = view.findViewById(R.id.todoLayout);
+
+        ll_Todo.setVisibility(view.INVISIBLE);
+
+        final Animation animFadeOut = AnimationUtils.loadAnimation(getActivity(), R.anim.anim_fade_out);
+        final Animation animFadeIn = AnimationUtils.loadAnimation(getActivity(), R.anim.anim_fade_in);
+
+        sv_Solution.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                float alpha1 = (float) (sv_Solution.getHeight() - scrollY) / (float) sv_Solution.getHeight();
+                float alpha2 = 1 - alpha1;
+
+                // 스크롤 위치가 상단인 경우
+                if (scrollY <= 0) {
+                    cl_MindMap.setVisibility(View.VISIBLE);
+                    ll_Todo.setVisibility(View.INVISIBLE);
+                }
+                // 스크롤 위치가 하단인 경우
+                else if (scrollY >= (sv_Solution.getChildAt(0).getHeight() - sv_Solution.getHeight())) {
+                    cl_MindMap.setVisibility(View.INVISIBLE);
+                    ll_Todo.setVisibility(View.VISIBLE);
+                }
+                // 그 외의 경우
+                else {
+                    if (scrollY > oldScrollY) { // 스크롤을 내릴 때
+                        cl_MindMap.animate().alpha(0f).setDuration(500).start(); // layout1 서서히 안보이게 하기
+                        ll_Todo.animate().alpha(1f).setDuration(500).start(); // layout2 서서히 나타내기
+                    } else if (scrollY < oldScrollY) { // 스크롤을 올릴 때
+                        ll_Todo.animate().alpha(0f).setDuration(500).start(); // layout2 서서히 안보이게 하기
+                        cl_MindMap.animate().alpha(1f).setDuration(500).start(); // layout1 서서히 나타내기
+                    }
+
+                }
+
+
+
+
+            }
+        });
     }
 
     public static void changeText(Map<String, Integer> sortedMap) {

@@ -91,7 +91,6 @@ public class SignInActivity extends AppCompatActivity {
                                     // 존재하지 않는 계정입니다.
                                     Toast.makeText(getApplicationContext(), "회원가입이 필요합니다.", Toast.LENGTH_SHORT).show();
                                     startSignUpActivity();
-                                    btn_SignIn.setEnabled(true);
                                 } else {
                                     // 존재하는 계정입니다.
                                     userRef.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -100,12 +99,10 @@ public class SignInActivity extends AppCompatActivity {
                                             if (dataSnapshot.exists()) {
                                                 // uid가 존재하는 경우
                                                 signIn();
-                                                btn_SignIn.setEnabled(true);
                                             } else {
                                                 // uid가 존재하지 않는 경우
                                                 Toast.makeText(getApplicationContext(), "회원가입이 필요합니다.", Toast.LENGTH_SHORT).show();
                                                 startSignUpActivity();
-                                                btn_SignIn.setEnabled(true);
                                             }
                                         }
                                         @Override
@@ -150,6 +147,7 @@ public class SignInActivity extends AppCompatActivity {
                 // 로그인 실패 시
                 Log.w("TAG", "Google sign in failed", e);
                 Toast.makeText(getApplicationContext(), "로그인에 실패했습니다.", Toast.LENGTH_SHORT).show();
+                btn_SignIn.setEnabled(true);
             }
         }
     }
@@ -193,7 +191,7 @@ public class SignInActivity extends AppCompatActivity {
                                                 @Override
                                                 public void onCancelled(@NonNull DatabaseError error) {
                                                     // 데이터베이스 액세스 중 오류 발생 시 처리 방법
-
+                                                    btn_SignIn.setEnabled(true);
                                                 }
                                             });
                                         }
@@ -207,15 +205,14 @@ public class SignInActivity extends AppCompatActivity {
                                 public void onCancelled(DatabaseError databaseError) {
                                     // 쿼리가 취소된 경우
                                     Toast.makeText(getApplicationContext(), "오류 발생", Toast.LENGTH_SHORT).show();
+                                    btn_SignIn.setEnabled(true);
                                 }
                             });
-
-
-
                         } else {
                             // 로그인 실패 시
                             Log.w("TAG", "signInWithCredential:failure", task.getException());
                             Toast.makeText(getApplicationContext(), "로그인 실패", Toast.LENGTH_SHORT).show();
+                            btn_SignIn.setEnabled(true);
                         }
                     }
                 });
