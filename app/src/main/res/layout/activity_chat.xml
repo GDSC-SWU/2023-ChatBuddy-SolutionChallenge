@@ -69,41 +69,43 @@
             android:paddingLeft="15dp"
             android:paddingRight="15dp" />
 
-        <FrameLayout
+        <RelativeLayout
             android:id="@+id/bottom_layout"
             android:layout_width="match_parent"
-            android:layout_height="92dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:gravity="bottom">
+            android:gravity="bottom"
+            android:layout_margin="15dp"
+            android:background="@drawable/rounded_corner"
+            android:backgroundTint="@color/main_darkGray">
 
             <EditText
                 android:id="@+id/message_edit_text"
-                android:layout_width="370dp"
-                android:layout_height="55dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:layout_toLeftOf="@id/send_btn"
-                android:background="@drawable/rounded_corner"
-                android:backgroundTint="@color/main_lightGray"
                 android:layout_gravity="center"
+                android:layout_toLeftOf="@id/send_btn"
+
+                android:backgroundTint="@color/transparent"
                 android:hint="고민을 적어주세요"
+
+                android:padding="16dp"
+                android:textColor="@color/white"
                 android:textColorHint="@color/text_lightGray"
                 android:textSize="16sp"
-                android:textColor="@color/white"
-                android:padding="16dp" />
+                android:maxLength="200"/>
 
             <ImageButton
                 android:id="@+id/send_btn"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:layout_alignParentEnd="true"
                 android:layout_centerInParent="true"
                 android:layout_gravity="right|center_vertical"
-                android:layout_marginLeft="35dp"
-                android:layout_marginRight="35dp"
-                android:src="@drawable/btn_send"
-                android:background="@android:color/transparent"/>
-
-        </FrameLayout>
+                android:background="@android:color/transparent"
+                android:src="@drawable/btn_send" />
+        </RelativeLayout>
 
     </RelativeLayout>
 

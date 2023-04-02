@@ -12,7 +12,7 @@ import java.util.Locale;
 
 public class TodoActivity extends AppCompatActivity {
 
-    private static final long START_TIME_IN_MILLIS = 600000; // 카운트다운 시간 10분
+    private static final long START_TIME_IN_MILLIS = 10000; // 카운트다운 시간 10분
     ImageButton btnBack, btnStart, btnSetting, btnMusic;
     TextView tvTime, tvComplete;
 
@@ -34,8 +34,7 @@ public class TodoActivity extends AppCompatActivity {
 
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) { finish();
-            }
+            public void onClick(View view) { finish(); }
         });
 
         // 시작 버튼 클릭 시
@@ -66,11 +65,18 @@ public class TodoActivity extends AppCompatActivity {
             public void onFinish() {
                 mTimerRunning = false;
                 btnStart.setImageResource(R.drawable.btn_solution_complete);
+
                 if(tvTime != null){tvTime.setVisibility(View.INVISIBLE);}
                 if(tvComplete != null){tvComplete.setVisibility(View.VISIBLE);}
                 if(btnSetting != null){btnSetting.setVisibility(View.INVISIBLE);}
                 if(btnMusic != null){btnMusic.setVisibility(View.INVISIBLE);}
 
+                btnStart.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        finish();
+                    }
+                });
             }
         }.start();
 

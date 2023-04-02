@@ -19,6 +19,26 @@
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
     </style>
 
+    <style name="Theme.Chatbuddy_green" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/main_green</item>
+        <item name="colorPrimaryVariant">@color/main_black</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="windowNoTitle">true</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/main_green</item>
+        <item name="colorSecondaryVariant">@color/main_green</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" >@color/main_green</item>
+        <!-- Customize your theme here. -->
+        <item name="android:windowBackground">@color/main_black</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="colorButtonNormal">@color/main_lightGray</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
+    </style>
+
+
     <style name="TextinputLayoutStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
         <item name="boxStrokeColor">@color/main_green</item>
         <item name="boxStrokeWidth">1dp</item>
