@@ -3,8 +3,10 @@ package com.example.chatbuddy;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -66,6 +68,9 @@ public class ChatActivity extends AppCompatActivity {
     JSONObject messageObject;
     int failed, selfHarm;
     String res_embedding;
+
+    LinearLayout ll_bot, ll_user;
+    Button btn1, btn2, btn3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -404,14 +409,18 @@ public class ChatActivity extends AppCompatActivity {
 
                         System.out.println(selfHarm);
 
-                        if (selfHarm > 2) {
+                        if (selfHarm > 3) {
+                            String str = "지금 서울시에서는 서울시 청년 '마음건강사업'을 제공하고 있어." +
+                                    "서울시에 거주하고 있는 만19세~39세 청년의 마음건강을 지원해. 최대 10회기*(1회기 50분) 심리상담 전문가와 함께 마음을 돌아볼 수 있어." +
+                                    "더 알아볼래?";
                             messageObject = new JSONObject();
-                            messageObject.put("role", "system");
-                            messageObject.put("content", "Have a deep conversation with her before recommend a counseling center. " +
-                                    "However, if she is about to self-harm, recommend a consultation with an expert. " +
-                                    "Let her know that the suicide prevention consultation call is '1393'.");
+                            messageObject.put("role", "assistant");
+                            messageObject.put("content", str);
                             messagesArray.put(messageObject);
-                            selfHarm = 0;
+
+                            btn1.setVisibility(View.VISIBLE);
+
+                            addToChat(str, Message.SENT_BY_BOT);
                         }
 
                     } catch (JSONException e) {
