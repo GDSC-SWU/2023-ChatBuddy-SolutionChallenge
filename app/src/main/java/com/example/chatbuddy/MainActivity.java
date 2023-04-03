@@ -59,6 +59,11 @@ public class MainActivity extends AppCompatActivity {
     TextView tvDrawerName;
     LinearLayout mainActivity;
     LinearLayout btnFirst, btnSetting, btnThird;
+    AtomicInteger state;
+    LayoutInflater inflater;
+    LinearLayout ll;
+    Animation animOpen;
+    Animation animClose;
 
     // firebase authentication
     GoogleSignInClient mGoogleSignInClient;
@@ -109,12 +114,12 @@ public class MainActivity extends AppCompatActivity {
         // 드로어
         mainActivity = findViewById(R.id.MainActivity);
         btnMenu = findViewById(R.id.btnMenu1);
-        LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        LinearLayout ll = (LinearLayout)inflater.inflate(R.layout.drawer, null);
+        inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        ll = (LinearLayout)inflater.inflate(R.layout.drawer, null);
 
-        AtomicInteger state = new AtomicInteger(); // 메뉴 상태 - 0이면 닫힌 상태, 1이면 열린 상태
-        final Animation animOpen = AnimationUtils.loadAnimation(this, R.anim.anim_translate_left);
-        final Animation animClose = AnimationUtils.loadAnimation(this, R.anim.anim_translate_right);
+        state = new AtomicInteger(); // 메뉴 상태 - 0이면 닫힌 상태, 1이면 열린 상태
+        animOpen = AnimationUtils.loadAnimation(this, R.anim.anim_translate_left);
+        animClose = AnimationUtils.loadAnimation(this, R.anim.anim_translate_right);
 
         btnSol = findViewById(R.id.btnSolution);
 
@@ -123,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
         mainActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (state.get() == 1) {
+                if(state.get() != 0) {
                     ll.startAnimation(animClose);
                     ((ViewManager) ll.getParent()).removeView(ll);
                     state.set(0);
@@ -183,6 +188,8 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Selected Third", Toast.LENGTH_LONG).show();
                 });
 
+
+
             } else {
                 ll.startAnimation(animClose);
                 ((ViewManager)ll.getParent()).removeView(ll);
@@ -190,16 +197,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        View rootView = findViewById(android.R.id.content).getRootView();
-        rootView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO: 이벤트 처리
-                ll.startAnimation(animClose);
-                ((ViewManager)ll.getParent()).removeView(ll);
-                state.set(0);
-            }
-        });
 
         btnSol.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -220,20 +217,17 @@ public class MainActivity extends AppCompatActivity {
         sendButton = findViewById(R.id.send_btn);
         // setup recycler view
         messageAdapter = new MessageAdapter(messageList);
-        sendButton.setEnabled(false);
 
         messageEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
                 if (hasFocus) {
                     // EditText가 선택될 때
-                    btnSol.setVisibility(View.GONE);
-                    sendButton.setEnabled(true);
                     sendButton.setVisibility(View.VISIBLE);
+                    btnSol.setVisibility(View.GONE);
                 } else {
                     // EditText가 선택 해제될 때
                     btnSol.setVisibility(View.VISIBLE);
-                    sendButton.setEnabled(false);
                     sendButton.setVisibility(View.INVISIBLE);
                 }
             }
@@ -307,6 +301,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean dispatchTouchEvent(MotionEvent event) {
         View v = getCurrentFocus();
         boolean ret = super.dispatchTouchEvent(event);
+
         if (v instanceof EditText) {
             View w = getCurrentFocus();
             int scrCoords[] = new int[2];
@@ -318,10 +313,10 @@ public class MainActivity extends AppCompatActivity {
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(getWindow().getCurrentFocus().getWindowToken(), 0);
                 messageEditText.clearFocus();
-                sendButton.setEnabled(false);
                 sendButton.setVisibility(View.INVISIBLE);
             }
         }
+
         return ret;
     }
 
