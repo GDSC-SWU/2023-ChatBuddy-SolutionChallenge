@@ -50,7 +50,6 @@
                         android:layout_height="160dp"
 
                         android:background="@drawable/circle"
-                        android:text="과제"
                         android:textSize="40sp"
 
                         app:layout_constraintTop_toTopOf="parent"
@@ -66,7 +65,6 @@
 
                         android:background="@drawable/circle"
                         android:backgroundTint="@color/main_orange"
-                        android:text="취업"
                         android:textSize="30sp"
 
                         app:layout_constraintTop_toTopOf="parent"
@@ -85,7 +83,6 @@
 
                         android:background="@drawable/circle"
                         android:backgroundTint="@color/text_lightGray"
-                        android:text="친구"
                         android:textColor="@color/black"
                         android:textSize="40sp"
 
@@ -101,7 +98,6 @@
 
                         android:background="@drawable/circle"
                         android:backgroundTint="@color/main_orange"
-                        android:text="돈"
                         android:textSize="20sp"
 
                         app:layout_constraintLeft_toRightOf="@+id/task1"
@@ -118,7 +114,6 @@
 
                         android:background="@drawable/circle"
                         android:backgroundTint="@color/main_orange"
-                        android:text="취업"
                         android:textSize="20sp"
 
                         app:layout_constraintLeft_toRightOf="@+id/task6"
@@ -135,7 +130,6 @@
 
                         android:background="@drawable/circle"
                         android:backgroundTint="@color/main_green"
-                        android:text="건강"
                         android:textSize="20sp"
 
                         app:layout_constraintLeft_toLeftOf="parent"
@@ -151,7 +145,6 @@
 
                         android:background="@drawable/circle"
                         android:backgroundTint="@color/text_lightGray"
-                        android:text="건강"
                         android:textSize="20sp"
                         android:textColor="@color/black"
 
@@ -169,7 +162,6 @@
 
                         android:background="@drawable/circle"
                         android:backgroundTint="@color/text_lightGray"
-                        android:text="친구"
                         android:textColor="@color/black"
                         android:textSize="20sp"
 
@@ -187,7 +179,6 @@
 
                         android:background="@drawable/circle"
                         android:backgroundTint="@color/main_lightGray"
-                        android:text="취업"
                         android:textSize="30sp"
 
                         app:layout_constraintBottom_toTopOf="@+id/task4"
@@ -203,7 +194,6 @@
 
                         android:background="@drawable/circle"
                         android:backgroundTint="@color/main_lightGray"
-                        android:text="취업"
                         android:textSize="30sp"
 
                         app:layout_constraintTop_toBottomOf="@+id/task8"
@@ -236,6 +226,7 @@
                         android:layout_marginBottom="20dp">
 
                         <ImageView
+                            android:id="@+id/chkRadio1"
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:src="@drawable/icon_solution_circle"
@@ -284,9 +275,10 @@
                         android:layout_marginBottom="70dp">
 
                         <ImageView
+                            android:id="@+id/chkRadio2"
                             android:layout_width="20dp"
                             android:layout_height="20dp"
-                            android:src="@drawable/icon_solution_lock1"
+                            android:src="@drawable/icon_solution_lock2"
                             android:layout_gravity="center"/>
 
                         <View
@@ -295,6 +287,7 @@
                             android:layout_weight="1"/>
 
                         <LinearLayout
+                            android:id="@+id/todo2"
                             android:layout_width="270dp"
                             android:layout_height="130dp"
                             android:background="@drawable/round_button"
@@ -333,6 +326,7 @@
                         android:layout_marginBottom="20dp">
 
                         <ImageView
+                            android:id="@+id/chkRadio3"
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:src="@drawable/icon_solution_lock2"
@@ -344,6 +338,7 @@
                             android:layout_weight="1"/>
 
                         <LinearLayout
+                            android:id="@+id/todo3"
                             android:layout_width="270dp"
                             android:layout_height="70dp"
                             android:background="@drawable/round_button"

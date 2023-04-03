@@ -1,5 +1,6 @@
 package com.example.chatbuddy;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.View;
@@ -12,18 +13,23 @@ import java.util.Locale;
 
 public class TodoActivity extends AppCompatActivity {
 
-    private static final long START_TIME_IN_MILLIS = 10000; // 카운트다운 시간 10분
+    private static final long START_TIME_IN_MILLIS = 600000; // 카운트다운 시간 10분
     ImageButton btnBack, btnStart, btnSetting, btnMusic;
     TextView tvTime, tvComplete;
 
     private CountDownTimer mCountDownTimer;
     private boolean mTimerRunning;
     private long mTimeLeftInMillis = START_TIME_IN_MILLIS;
+    public static Boolean is_success; // 다른 Activity에서 접근할 변수
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        is_success = false;
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_todo);
+
 
         btnBack = findViewById(R.id.btnBack);
         btnStart = findViewById(R.id.btnStart);
@@ -34,7 +40,13 @@ public class TodoActivity extends AppCompatActivity {
 
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) { finish(); }
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.putExtra("result_key", is_success);
+                setResult(RESULT_OK, intent);
+
+                finish();
+            }
         });
 
         // 시작 버튼 클릭 시
@@ -65,6 +77,8 @@ public class TodoActivity extends AppCompatActivity {
             public void onFinish() {
                 mTimerRunning = false;
                 btnStart.setImageResource(R.drawable.btn_solution_complete);
+                is_success = true;
+
 
                 if(tvTime != null){tvTime.setVisibility(View.INVISIBLE);}
                 if(tvComplete != null){tvComplete.setVisibility(View.VISIBLE);}
@@ -74,6 +88,10 @@ public class TodoActivity extends AppCompatActivity {
                 btnStart.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        Intent intent = new Intent();
+                        intent.putExtra("result_key", is_success);
+                        setResult(RESULT_OK, intent);
+
                         finish();
                     }
                 });
@@ -98,4 +116,5 @@ public class TodoActivity extends AppCompatActivity {
 
         tvTime.setText(timeLeftFormatted);
     }
+
 }

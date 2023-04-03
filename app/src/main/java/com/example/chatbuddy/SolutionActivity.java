@@ -1,6 +1,5 @@
 package com.example.chatbuddy;
 
-import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
@@ -85,9 +84,12 @@ public class SolutionActivity extends AppCompatActivity {
 
     ScrollView sv_Solution;
     ConstraintLayout solActivity, cl_MindMap;
-    LinearLayout ll_Todo, todo1;
+    LinearLayout ll_Todo, todo1, todo2, todo3;
 
     ImageButton btnChat;
+    ImageView rd1, rd2, rd3;
+    private static final int REQUEST_CODE = 1;
+    private Boolean res;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,9 +113,10 @@ public class SolutionActivity extends AppCompatActivity {
         builder = new StringBuilder();
         ArrayList<String> wordsList = new ArrayList<>();
 
-        layout.setVisibility(INVISIBLE);
-        tvWelcome.setVisibility(INVISIBLE);
 
+        sv_Solution = findViewById(R.id.scrollSolution);
+        cl_MindMap = findViewById(R.id.MindMapLayout);
+        ll_Todo = findViewById(R.id.todoLayout);
 
         chatRef.child("user").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -138,7 +141,7 @@ public class SolutionActivity extends AppCompatActivity {
 
                         tvWelcome.setVisibility(VISIBLE);
                         tvWelcome.setText("대화 정보가 없습니다\n츄디와 대화를 시작하세요");
-                        layout.setVisibility(GONE);
+                        child.setText("");
                     }
                 } else {
                     tvWelcome.setVisibility(VISIBLE);
@@ -171,7 +174,7 @@ public class SolutionActivity extends AppCompatActivity {
             }
         });
 
-        cnt = 0;
+        /*cnt = 0;
         for (int i = 0; i < layout.getChildCount(); i++) {
             View child = layout.getChildAt(i);
             final Animation pop = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.anim_pop);
@@ -182,26 +185,13 @@ public class SolutionActivity extends AppCompatActivity {
                     child.setEnabled(false);
                     cnt++;
 
-                    if (cnt == 9) {
-                        layout.setVisibility(GONE);
+                    if (cnt == 10) {
+                        cl_MindMap.setVisibility(GONE);
                     }
                 }
             });
-        }
+        }*/
 
-        todo1 = findViewById(R.id.todo1);
-        todo1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), TodoActivity.class);
-                startActivity(intent);
-            }
-        });
-
-
-        sv_Solution = findViewById(R.id.scrollSolution);
-        cl_MindMap = findViewById(R.id.MindMapLayout);
-        ll_Todo = findViewById(R.id.todoLayout);
 
         ll_Todo.setVisibility(INVISIBLE);
 
@@ -241,6 +231,33 @@ public class SolutionActivity extends AppCompatActivity {
 
             }
         });
+
+        todo1 = findViewById(R.id.todo1);
+        todo2 = findViewById(R.id.todo2);
+        todo3 = findViewById(R.id.todo3);
+
+        todo2.setEnabled(false);
+        todo3.setEnabled(false);
+
+        rd1 = findViewById(R.id.chkRadio1);
+        rd2 = findViewById(R.id.chkRadio2);
+        rd3 = findViewById(R.id.chkRadio3);
+
+        todo1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), TodoActivity.class);
+                startActivityForResult(intent, REQUEST_CODE);
+            }
+        });
+
+        todo2.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getApplicationContext(), "사진 찍기",Toast.LENGTH_LONG).show();
+            }
+        });
+
 
         // 드로어
         solActivity = findViewById(R.id.SolutionActivity);
@@ -334,9 +351,28 @@ public class SolutionActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // requestCode가 REQUEST_CODE_SECOND_ACTIVITY이고 resultCode가 RESULT_OK일 경우에만 실행합니다.
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
+            // SecondActivity에서 전달받은 결과 값을 변수에 저장합니다.
+            res = data.getBooleanExtra("result_key", false);
+
+            if (res == true) {
+                todo1.setEnabled(false);
+                todo2.setEnabled(true);
+                rd1.setImageResource(R.drawable.icon_solution_done);
+                rd2.setImageResource(R.drawable.icon_solution_lock1);
+            }
+        }
+    }
+
+
     void startMainActivity() {
-        finishAffinity();
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
 

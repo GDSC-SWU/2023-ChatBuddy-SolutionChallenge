@@ -5,10 +5,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -188,6 +190,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        View rootView = findViewById(android.R.id.content).getRootView();
+        rootView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO: 이벤트 처리
+                ll.startAnimation(animClose);
+                ((ViewManager)ll.getParent()).removeView(ll);
+                state.set(0);
+            }
+        });
+
         btnSol.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -207,6 +220,24 @@ public class MainActivity extends AppCompatActivity {
         sendButton = findViewById(R.id.send_btn);
         // setup recycler view
         messageAdapter = new MessageAdapter(messageList);
+        sendButton.setEnabled(false);
+
+        messageEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    // EditText가 선택될 때
+                    btnSol.setVisibility(View.GONE);
+                    sendButton.setEnabled(true);
+                    sendButton.setVisibility(View.VISIBLE);
+                } else {
+                    // EditText가 선택 해제될 때
+                    btnSol.setVisibility(View.VISIBLE);
+                    sendButton.setEnabled(false);
+                    sendButton.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
 
         recyclerView.setAdapter(messageAdapter);
         LinearLayoutManager llm = new LinearLayoutManager(this);
@@ -271,9 +302,32 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // 키보드 이외 영역 터치했을 때 키보드 끄기
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        View v = getCurrentFocus();
+        boolean ret = super.dispatchTouchEvent(event);
+        if (v instanceof EditText) {
+            View w = getCurrentFocus();
+            int scrCoords[] = new int[2];
+            w.getLocationOnScreen(scrCoords);
+            float x = event.getRawX() + w.getLeft() - scrCoords[0];
+            float y = event.getRawY() + w.getTop() - scrCoords[1];
+
+            if (event.getAction() == MotionEvent.ACTION_UP && (x < w.getLeft() || x >= w.getRight() || y < w.getTop() || y > w.getBottom())) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(getWindow().getCurrentFocus().getWindowToken(), 0);
+                messageEditText.clearFocus();
+                sendButton.setEnabled(false);
+                sendButton.setVisibility(View.INVISIBLE);
+            }
+        }
+        return ret;
+    }
+
     void startSolutionActivity() {
-        finishAffinity();
         Intent intent = new Intent(getApplicationContext(), SolutionActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
 

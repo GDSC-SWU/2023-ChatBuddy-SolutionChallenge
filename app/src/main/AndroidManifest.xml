@@ -14,8 +14,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/app_logo_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Chatbuddy"
-        tools:targetApi="31">
+        android:theme="@style/Theme.Chatbuddy" >
         <activity
             android:name=".SolutionActivity"
             android:exported="false" />
@@ -33,6 +32,7 @@
             </intent-filter>
         </activity>
         <activity
+            android:theme="@style/Theme.Chatbuddy_darkGray"
             android:name=".SettingsActivity"
             android:exported="false" />
         <activity
