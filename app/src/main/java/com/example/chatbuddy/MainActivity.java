@@ -11,7 +11,6 @@ import android.view.ViewManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -57,13 +56,11 @@ public class MainActivity extends AppCompatActivity {
     ImageButton btnMenu, btnSol;
     // 드로어
     TextView tvDrawerName;
-    LinearLayout mainActivity;
-    LinearLayout btnFirst, btnSetting, btnThird;
+    LinearLayout mainActivity, btnFirst, btnSetting, btnThird;
     AtomicInteger state;
     LayoutInflater inflater;
     LinearLayout ll;
-    Animation animOpen;
-    Animation animClose;
+    Animation animOpen, animClose;
 
     // firebase authentication
     GoogleSignInClient mGoogleSignInClient;
@@ -90,8 +87,6 @@ public class MainActivity extends AppCompatActivity {
     int failed, selfHarm;
     String res_embedding;
 
-    LinearLayout ll_bot, ll_user;
-    Button btn1, btn2, btn3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -216,8 +211,7 @@ public class MainActivity extends AppCompatActivity {
         messageEditText = findViewById(R.id.message_edit_text);
         sendButton = findViewById(R.id.send_btn);
         // setup recycler view
-        messageAdapter = new MessageAdapter(messageList);
-
+        messageAdapter = new MessageAdapter(messageList, this);
         messageEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
@@ -250,7 +244,6 @@ public class MainActivity extends AppCompatActivity {
                 blockEdit(false);
                 try {
                     callChatAPI(question);
-                    callModAPI(question);
                     //embeddings();
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
@@ -438,76 +431,91 @@ public class MainActivity extends AppCompatActivity {
                 .post(body)
                 .build();
 
-        // request 요청
-        client.newCall(request).enqueue(new Callback() {
-            // timeout 등 오류
-            @Override
-            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                failed++;
+        callModAPI(question);
 
-                System.out.println("(1) Failed to load response due to " + e.getMessage());
-                // 이전 question 제거
-                messageList.remove(messageList.size() - 1);
-                messagesArray.remove(messagesArray.length() - 1);
+        if (selfHarm == 2) {
+            String str = "지금 서울시에서는 서울시 청년 '마음건강사업'을 제공하고 있어. " +
+                    "서울시에 거주하고 있는 만19세~39세 청년의 마음건강을 지원해. 최대 10회기*(1회기 50분) 심리상담 전문가와 함께 마음을 돌아볼 수 있어. " +
+                    "더 알아볼래?";
+            messageObject = new JSONObject();
+            messageObject.put("role", "assistant");
+            messageObject.put("content", str);
+            messagesArray.put(messageObject);
 
-                // 여러번 실패하면 이전 내용 제거
-                if (failed > 3 && messagesArray.length() > 4) {
-                    messagesArray.remove(0);
-                }
-
-                try {
-                    // question 재전송
-                    callChatAPI(question);
-                } catch (JSONException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
-
-            @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                JSONObject jsonObject = null;
-
-                if (response.isSuccessful()) {
-                    try {
-                        jsonObject = new JSONObject(response.body().string());
-                        JSONArray jsonArray = jsonObject.getJSONArray("choices");
-                        String result = jsonArray.getJSONObject(0).getJSONObject("message").getString("content");
-                        addResponse(result.trim());
-
-                        JSONObject resMessageObject = new JSONObject();
-                        resMessageObject.put("role", "assistant");
-                        resMessageObject.put("content", result.trim());
-                        userRef.child(currentUser.getUid()).child("chat").child("assistant").child(String.valueOf(System.currentTimeMillis())).setValue(result.trim());
-                        messagesArray.put(resMessageObject);
-
-                        // 결과 확인
-                        String jsonString = messagesArray.toString();
-                        int jsonLength = jsonString.length();
-                        System.out.println(jsonLength + ": " + jsonString);
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                } else {
+            messageList.remove(messageList.size() - 1);
+            addToChat(str, Message.ASK1);
+        } else {
+            // request 요청
+            client.newCall(request).enqueue(new Callback() {
+                // timeout 등 오류
+                @Override
+                public void onFailure(@NonNull Call call, @NonNull IOException e) {
                     failed++;
 
-                    System.out.println("(2) Failed to load response due to " + response.body().string());
-                    // 이전 메세지 제거
+                    System.out.println("(1) Failed to load response due to " + e.getMessage());
+                    // 이전 question 제거
                     messageList.remove(messageList.size() - 1);
                     messagesArray.remove(messagesArray.length() - 1);
 
+                    // 여러번 실패하면 이전 내용 제거
                     if (failed > 3 && messagesArray.length() > 4) {
-                        messagesArray.remove(1);
+                        messagesArray.remove(0);
                     }
 
                     try {
+                        // question 재전송
                         callChatAPI(question);
                     } catch (JSONException ex) {
                         throw new RuntimeException(ex);
                     }
                 }
-            }
-        });
+
+                @Override
+                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                    JSONObject jsonObject = null;
+
+                    if (response.isSuccessful()) {
+                        try {
+                            jsonObject = new JSONObject(response.body().string());
+                            JSONArray jsonArray = jsonObject.getJSONArray("choices");
+                            String result = jsonArray.getJSONObject(0).getJSONObject("message").getString("content");
+                            addResponse(result.trim());
+
+                            JSONObject resMessageObject = new JSONObject();
+                            resMessageObject.put("role", "assistant");
+                            resMessageObject.put("content", result.trim());
+                            userRef.child(currentUser.getUid()).child("chat").child("assistant").child(String.valueOf(System.currentTimeMillis())).setValue(result.trim());
+                            messagesArray.put(resMessageObject);
+
+                            // 결과 확인
+                            String jsonString = messagesArray.toString();
+                            int jsonLength = jsonString.length();
+                            System.out.println(jsonLength + ": " + jsonString);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        failed++;
+
+                        System.out.println("(2) Failed to load response due to " + response.body().string());
+                        // 이전 메세지 제거
+                        messageList.remove(messageList.size() - 1);
+                        messagesArray.remove(messagesArray.length() - 1);
+
+                        if (failed > 3 && messagesArray.length() > 4) {
+                            messagesArray.remove(1);
+                        }
+
+                        try {
+                            callChatAPI(question);
+                        } catch (JSONException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    }
+                }
+            });
+        }
     }
 
     public void removeSys() {
@@ -544,7 +552,6 @@ public class MainActivity extends AppCompatActivity {
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 System.out.println("Failed to load response due to " + e.getMessage());
             }
-
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 if (response.isSuccessful()) {
@@ -565,20 +572,6 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         System.out.println(selfHarm);
-
-                        if (selfHarm > 3) {
-                            String str = "지금 서울시에서는 서울시 청년 '마음건강사업'을 제공하고 있어." +
-                                    "서울시에 거주하고 있는 만19세~39세 청년의 마음건강을 지원해. 최대 10회기*(1회기 50분) 심리상담 전문가와 함께 마음을 돌아볼 수 있어." +
-                                    "더 알아볼래?";
-                            messageObject = new JSONObject();
-                            messageObject.put("role", "assistant");
-                            messageObject.put("content", str);
-                            messagesArray.put(messageObject);
-
-                            btn1.setVisibility(View.VISIBLE);
-
-                            addToChat(str, Message.SENT_BY_BOT);
-                        }
 
                     } catch (JSONException e) {
                         e.printStackTrace();

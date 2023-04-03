@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:padding="8dp">
 
     <LinearLayout
@@ -18,11 +19,63 @@
             android:id="@+id/left_chat_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:textColor="@color/white"
+            android:textSize="18sp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/left_ask1_view"
+        android:background="@drawable/rounded_corner"
+        android:backgroundTint="@color/main_darkGray"
+        android:padding="8dp"
+        android:layout_marginEnd="80dp"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/left_ask1_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
             android:textColor="@color/white"
             android:textSize="18sp"/>
 
         <Button
-            android:id="@+id/btn1"
+            android:id="@+id/left_ask1_btn1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/round_button"
+            android:backgroundTint="@color/main_lightGray"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/left_ask2_view"
+        android:background="@drawable/rounded_corner"
+        android:backgroundTint="@color/main_darkGray"
+        android:padding="8dp"
+        android:layout_marginEnd="80dp"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/left_ask2_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:textColor="@color/white"
+            android:textSize="18sp"/>
+
+        <Button
+            android:id="@+id/left_ask2_btn1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
@@ -31,7 +84,7 @@
             android:visibility="gone"/>
 
         <Button
-            android:id="@+id/btn2"
+            android:id="@+id/left_ask2_btn2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
@@ -40,7 +93,7 @@
             android:visibility="gone"/>
 
         <Button
-            android:id="@+id/btn3"
+            android:id="@+id/left_ask2_btn3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
@@ -62,6 +115,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="8dp"
             android:id="@+id/right_chat_text_view"
             android:textColor="@color/white"
             android:textSize="18sp" />

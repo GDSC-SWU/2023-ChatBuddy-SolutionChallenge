@@ -1,6 +1,7 @@
 package com.example.chatbuddy;
 
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.View;
@@ -13,7 +14,7 @@ import java.util.Locale;
 
 public class TodoActivity extends AppCompatActivity {
 
-    private static final long START_TIME_IN_MILLIS = 600000; // 카운트다운 시간 10분
+    private static final long START_TIME_IN_MILLIS = 10000; // 카운트다운 시간 10분
     ImageButton btnBack, btnStart, btnSetting, btnMusic;
     TextView tvTime, tvComplete;
 
@@ -21,6 +22,8 @@ public class TodoActivity extends AppCompatActivity {
     private boolean mTimerRunning;
     private long mTimeLeftInMillis = START_TIME_IN_MILLIS;
     public static Boolean is_success; // 다른 Activity에서 접근할 변수
+    MediaPlayer mediaPlayer;
+    Boolean is_playing;
 
 
     @Override
@@ -38,6 +41,23 @@ public class TodoActivity extends AppCompatActivity {
         tvComplete = findViewById(R.id.tvComplete);
         tvTime = findViewById(R.id.tvTime);
 
+        mediaPlayer = MediaPlayer.create(this, R.raw.canon);
+        mediaPlayer.setLooping(true);
+        is_playing = false;
+
+        btnMusic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (is_playing == false) {
+                    mediaPlayer.start();
+                    is_playing = true;
+                } else {
+                    mediaPlayer.pause();
+                    is_playing = false;
+                }
+            }
+        });
+
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -45,6 +65,8 @@ public class TodoActivity extends AppCompatActivity {
                 intent.putExtra("result_key", is_success);
                 setResult(RESULT_OK, intent);
 
+                mediaPlayer.pause();
+                mediaPlayer.release();
                 finish();
             }
         });
@@ -78,7 +100,9 @@ public class TodoActivity extends AppCompatActivity {
                 mTimerRunning = false;
                 btnStart.setImageResource(R.drawable.btn_solution_complete);
                 is_success = true;
-
+                is_playing = true;
+                mediaPlayer.pause();
+                mediaPlayer.release();
 
                 if(tvTime != null){tvTime.setVisibility(View.INVISIBLE);}
                 if(tvComplete != null){tvComplete.setVisibility(View.VISIBLE);}
