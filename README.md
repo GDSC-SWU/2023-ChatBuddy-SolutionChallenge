@@ -11,7 +11,6 @@ Due to the prolonged COVID-19, Korean youth mental health indicators have deteri
 
 
 
-
 ## About CHATBuddy
 ### _"Buddy service for youth with depression"_ <br/>
 As a mental health supporter, CHATBuddy takes care of your mental health. When you want to feel free to share your situation or feelings with someone, please visit CHATBuddy. Through ordinary daily conversations, you can identify the cause of anxiety and receive daily solutions.<br/>
@@ -32,6 +31,8 @@ As a mental health supporter, CHATBuddy takes care of your mental health. When y
   * Cognitive function, emotional state measurement and emotional solution provision
   * Suicide prediction and health service linkage (simple information_link)
 
+## Demo
+[![thumbnail](https://user-images.githubusercontent.com/68415422/229873666-0d2a5e4a-936d-493d-a1be-5e50cf1ce293.JPG)](https://www.youtube.com/watch?v=Clnm2T3QIpY)
 
 ## Team members
 🧑‍💻 김정현(Jeong-Hyeon Kim) <br/>
