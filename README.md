@@ -33,9 +33,6 @@ As a mental health supporter, CHATBuddy takes care of your mental health. When y
   * Suicide prediction and health service linkage (simple information_link)
 
 
-## UI
-
-
 ## Team members
 🧑‍💻 김정현(Jeong-Hyeon Kim) <br/>
 🧑‍💻 이정인(Jeong-In Lee) <br/>
